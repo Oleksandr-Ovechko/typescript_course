@@ -1,0 +1,22 @@
+{
+  // Настройки дословно повторяют корневой tsconfig.json из wl-e2e — поведение
+  // компилятора здесь и на проекте совпадает один в один.
+  //
+  // Этот конфиг покрывает playground/ — всё, что набирается на уроке и после.
+  // Новую папку под урок заводить не нужно: делайте playground/lesson-NN/.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM"],
+    "isolatedModules": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true
+  },
+  "include": ["playground/**/*.ts", "lessons/**/examples/**/*.ts"],
+  // broken/ и homework/ проверяются отдельными командами: там ошибки намеренные.
+  "exclude": ["**/broken/**", "**/homework/**", "node_modules"]
+}
