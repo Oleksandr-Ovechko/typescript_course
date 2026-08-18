@@ -259,15 +259,17 @@ type SizeValue = (typeof SIZE)[SizeName];  // 1 | 2 | 3
 `as const` фиксирует значения — без него TS вывел бы просто `number`, и вся польза
 исчезла бы. `keyof typeof` даёт union ключей, обращение по ключу — union значений.
 
-Тот же приём на массиве, реальный код из `C154002.helpers.ts`:
+Тот же приём на массиве, реальный код из `C85963.spec.ts`:
 
 ```ts
-const SETTINGS_SECTIONS = ['Lead form behavior', 'Form Settings', '...'] as const;
-type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
+const SECTIONS = ['Attendance', 'Account', 'Rewards'] as const;
+type Section = (typeof SECTIONS)[number];
 ```
 
 `[number]` означает «тип любого элемента по числовому индексу». Список написан один
-раз: по нему бегает цикл и по нему же проверяются типы.
+раз: по нему бегает цикл и по нему же проверяются типы. В том же файле этот union
+сразу идёт в `Record<(typeof SECTIONS)[number], boolean>` — то есть в таблицу
+из следующего раздела.
 
 **`Record<Union, T>` — таблица, которую нельзя недозаполнить:**
 

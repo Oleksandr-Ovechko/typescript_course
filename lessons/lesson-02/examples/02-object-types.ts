@@ -68,7 +68,7 @@ type TestCase = {
   title: string;
 };
 
-const testCase: TestCase = { id: 'C154002', title: 'Lead capture — toggles' };
+const testCase: TestCase = { id: 'C154005', title: 'Lead capture — form settings' };
 testCase.title = 'новый заголовок';
 
 // ❌ TS2540: Cannot assign to 'id' because it is a read-only property

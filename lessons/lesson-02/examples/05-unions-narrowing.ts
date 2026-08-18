@@ -15,7 +15,7 @@
 // ── Union — «или то, или это» ──────────────────────────────────────────────
 type Id = string | number;
 const numericId: Id = 42;
-const textId: Id = 'C154002';
+const textId: Id = 'C154005';
 console.log('union:', numericId, textId);
 
 // ── Литеральные типы ───────────────────────────────────────────────────────
@@ -51,11 +51,14 @@ console.log('вместо enum:', createOrder('Футболка WL', SIZE.M));
 // ❌ TS2345: 99 не входит в 1 | 2 | 3
 // createOrder('Футболка WL', 99);
 
-const SETTINGS_SECTIONS = ['Lead form behavior', 'Form Settings', 'Thank you message customization'] as const;
-type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
+// Реальный код: projects/monolith/tests/regression-run/client-profile/overview/
+// C85963.spec.ts — там же этот union
+// сразу используется как ключи Record, см. следующий раздел файла.
+const SECTIONS = ['Attendance', 'Account', 'Rewards'] as const;
+type Section = (typeof SECTIONS)[number];
 
-const section: SettingsSection = 'Form Settings';
-console.log('union из массива:', section, '· всего секций:', SETTINGS_SECTIONS.length);
+const section: Section = 'Account';
+console.log('union из массива:', section, '· всего секций:', SECTIONS.length);
 
 // ── Record<Union, T> ───────────────────────────────────────────────────────
 const GROUP_QUICK_CONTACT_SOURCE_CLASS: Record<QuickContactSource, string> = {
