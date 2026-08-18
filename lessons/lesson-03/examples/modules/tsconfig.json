@@ -1,0 +1,31 @@
+{
+  // Тот же набор настроек, что и в корневом конфиге, плюс ровно одна добавка:
+  // allowImportingTsExtensions. Она нужна из-за настоящего конфликта, который
+  // в самом wl-e2e не проявляется.
+  //
+  //   import { x } from './helper'      tsc ✅   node ❌ ERR_MODULE_NOT_FOUND
+  //   import { x } from './helper.ts'   tsc ❌   node ✅
+  //                                     TS5097
+  //
+  // Формы, которая устраивает обоих, не существует. В wl-e2e импорты пишутся
+  // без расширения и работают, потому что тесты запускает Playwright — он
+  // прогоняет файлы через babel со своим разрешением путей, а не через node.
+  // В курсе мы запускаем файлы напрямую, поэтому расширение обязательно.
+  //
+  // Поэтому у этой папки свой конфиг и своя команда: yarn typecheck:modules
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM"],
+    "isolatedModules": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["*.ts"],
+  "exclude": []
+}

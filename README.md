@@ -19,9 +19,11 @@ yarn install     # или npm install — здесь одна зависимос
 
 ```bash
 node playground/scratch.ts                           # запустить свой код
-node lessons/lesson-02/examples/02-object-types.ts   # запустить пример урока
+node lessons/lesson-03/examples/02-functions.ts       # запустить пример урока
 yarn typecheck                                       # типы: playground + примеры
-yarn typecheck:hw                                    # типы: своя домашка
+yarn typecheck:hw2                                   # типы: домашка урока 2
+yarn typecheck:hw3                                   # типы: домашка урока 3
+yarn typecheck:modules                               # типы: пример про импорты
 yarn typecheck:broken                                # намеренно сломанные файлы
 ```
 
@@ -59,7 +61,7 @@ playground/        ← где набираем код: на уроке и сам
 |---|------|-----------|
 | 1 | Структура проекта, транспиляция, `tsconfig`, встроенные типы | [конспект](lessons/lesson-01/) |
 | 2 | Типы объектов, структурная типизация, дженерики, union'ы | [конспект](lessons/lesson-02/) · [примеры](lessons/lesson-02/examples/) · [домашка](lessons/lesson-02/homework/) |
-| 3 | Как читать файл теста: `?.` и `??`, функции и колбэки, модули, деструктуризация | [план и словарь](lessons/lesson-03/) |
+| 3 | Как читать файл теста: `?.` и `??`, функции и колбэки, модули, деструктуризация | [конспект](lessons/lesson-03/) · [примеры](lessons/lesson-03/examples/) · [домашка](lessons/lesson-03/homework/) |
 | 3.5 | Ловушки JavaScript: `==`, falsy, числа, строки, TDZ | планируется |
 | 4 | Асинхронность: промисы, `async`/`await`, замыкания | планируется |
 

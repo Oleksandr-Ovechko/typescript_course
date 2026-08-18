@@ -17,6 +17,7 @@
     "noEmit": true
   },
   "include": ["playground/**/*.ts", "lessons/**/examples/**/*.ts"],
-  // broken/ и homework/ проверяются отдельными командами: там ошибки намеренные.
-  "exclude": ["**/broken/**", "**/homework/**", "node_modules"]
+  // broken/, homework/ и modules/ проверяются отдельными командами:
+  // в первых двух ошибки намеренные, у третьей своя настройка импортов.
+  "exclude": ["**/broken/**", "**/homework/**", "**/modules/**", "node_modules"]
 }

@@ -6,7 +6,9 @@
   "description": "JS/TS course for wl-e2e team",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "typecheck:hw": "tsc --noEmit -p lessons/lesson-02/homework",
+    "typecheck:hw2": "tsc --noEmit -p lessons/lesson-02/homework",
+    "typecheck:hw3": "tsc --noEmit -p lessons/lesson-03/homework",
+    "typecheck:modules": "tsc -p lessons/lesson-03/examples/modules --noEmit",
     "typecheck:broken": "tsc --noEmit -p lessons/lesson-02/examples/broken"
   },
   "devDependencies": {
