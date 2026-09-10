@@ -24,9 +24,17 @@ yarn typecheck                                       # типы: playground + п
 yarn typecheck:hw2                                   # типы: домашка урока 2
 yarn typecheck:hw3                                   # типы: домашка урока 3
 yarn typecheck:hw5                                   # типы: домашка урока 5
+yarn typecheck:hw6                                   # типы: домашка урока 6
 yarn typecheck:modules                               # типы: пример про импорты
 yarn typecheck:broken                                # намеренно сломанные файлы
+
+bash lessons/lesson-08/examples/01-three-trees.sh     # запустить пример по git
 ```
+
+> Примеры уроков 8 и 9 — не TypeScript, а исполняемые сценарии `bash`. Каждый
+> заводит свою песочницу в `/tmp/wl-git-examples/`, выполняет команды и по ходу
+> объясняет вывод. Ничего за пределами `/tmp` они не трогают, рабочий репозиторий
+> в безопасности.
 
 > Корневой `tsconfig.json` **дословно повторяет `tsconfig.json` из wl-e2e** —
 > поведение компилятора здесь и на проекте совпадает один в один. Он покрывает
@@ -69,9 +77,10 @@ playground/        ← где набираем код: на уроке и сам
 | 2 | Типы объектов, структурная типизация, дженерики, union'ы | [конспект](lessons/lesson-02/) · [примеры](lessons/lesson-02/examples/) · [домашка](lessons/lesson-02/homework/) |
 | 3 | Как читать файл теста: `?.` и `??`, функции и колбэки, модули, деструктуризация | [конспект](lessons/lesson-03/) · [примеры](lessons/lesson-03/examples/) · [домашка](lessons/lesson-03/homework/) |
 | 4 | Ловушки JavaScript: `typeof`, приведение типов, числа, строки, область видимости | [конспект](lessons/lesson-04/) · [примеры](lessons/lesson-04/examples/) |
-| 5 | Асинхронность и замыкания: промисы, `async`/`await`, `Promise.all`, замыкания | [план и словарь](lessons/lesson-05/) |
-| 4 | Ловушки JavaScript: `==`, falsy, числа, строки, TDZ | планируется |
-| 5 | Асинхронность: промисы, `async`/`await`, замыкания | планируется |
+| 5 | Асинхронность: промисы, `.then`/`.catch`/`.finally`, `async`/`await`, `Promise.all` | [конспект](lessons/lesson-05/) · [примеры](lessons/lesson-05/examples/) · [домашка](lessons/lesson-05/homework/) |
+| 6 | Замыкания, `this` и контекст: лексическое окружение, `call`/`apply`/`bind` | [конспект](lessons/lesson-06/) · [примеры](lessons/lesson-06/examples/) · [домашка](lessons/lesson-06/homework/) |
+| 8 | Git: своя история — три дерева, ветки, чтение истории, откаты, `reflog` | [конспект](lessons/lesson-08/) · [примеры](lessons/lesson-08/examples/) · [домашка](lessons/lesson-08/homework/) |
+| 9 | Git: чужие изменения — сервер, конфликты, `worktree`, PR на `draft` | [конспект](lessons/lesson-09/) · [примеры](lessons/lesson-09/examples/) · [домашка](lessons/lesson-09/homework/) |
 
 ## Соглашения в коде методичек
 
