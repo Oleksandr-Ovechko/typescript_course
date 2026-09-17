@@ -81,6 +81,7 @@ playground/        ← где набираем код: на уроке и сам
 | 6 | Замыкания, `this` и контекст: лексическое окружение, `call`/`apply`/`bind` | [конспект](lessons/lesson-06/) · [примеры](lessons/lesson-06/examples/) · [домашка](lessons/lesson-06/homework/) |
 | 8 | Git: своя история — три дерева, ветки, чтение истории, откаты, `reflog` | [конспект](lessons/lesson-08/) · [примеры](lessons/lesson-08/examples/) · [домашка](lessons/lesson-08/homework/) |
 | 9 | Git: чужие изменения — сервер, конфликты, `worktree`, PR на `draft` | [конспект](lessons/lesson-09/) · [примеры](lessons/lesson-09/examples/) · [домашка](lessons/lesson-09/homework/) |
+| 10 | Циклы, перебор и генераторы: `for...of`, протокол итератора, `function*`, `for await` | [план и словарь](lessons/lesson-10/) — выложено до занятия |
 
 ## Соглашения в коде методичек
 
