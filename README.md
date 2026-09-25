@@ -25,15 +25,17 @@ yarn typecheck:hw2                                   # типы: домашка 
 yarn typecheck:hw3                                   # типы: домашка урока 3
 yarn typecheck:hw5                                   # типы: домашка урока 5
 yarn typecheck:hw6                                   # типы: домашка урока 6
+yarn typecheck:hw10                                  # типы: домашка урока 10
+yarn typecheck:hw12                                  # типы: домашка урока 12
 yarn typecheck:modules                               # типы: пример про импорты
 yarn typecheck:broken                                # намеренно сломанные файлы
 
 bash lessons/lesson-08/examples/01-three-trees.sh     # запустить пример по git
 ```
 
-> Примеры уроков 8 и 9 — не TypeScript, а исполняемые сценарии `bash`. Каждый
-> заводит свою песочницу в `/tmp/wl-git-examples/`, выполняет команды и по ходу
-> объясняет вывод. Ничего за пределами `/tmp` они не трогают, рабочий репозиторий
+> Примеры уроков 8, 9, 11 и 12 — не TypeScript, а исполняемые сценарии `bash`.
+> Каждый заводит свою песочницу в `/tmp/wl-git-examples/` (git) или
+> `/tmp/wl-pw-examples/` (Playwright), выполняет команды и по ходу объясняет вывод. Ничего за пределами `/tmp` они не трогают, рабочий репозиторий
 > в безопасности.
 
 > Корневой `tsconfig.json` **дословно повторяет `tsconfig.json` из wl-e2e** —
@@ -81,7 +83,9 @@ playground/        ← где набираем код: на уроке и сам
 | 6 | Замыкания, `this` и контекст: лексическое окружение, `call`/`apply`/`bind` | [конспект](lessons/lesson-06/) · [примеры](lessons/lesson-06/examples/) · [домашка](lessons/lesson-06/homework/) |
 | 8 | Git: своя история — три дерева, ветки, чтение истории, откаты, `reflog` | [конспект](lessons/lesson-08/) · [примеры](lessons/lesson-08/examples/) · [домашка](lessons/lesson-08/homework/) |
 | 9 | Git: чужие изменения — сервер, конфликты, `worktree`, PR на `draft` | [конспект](lessons/lesson-09/) · [примеры](lessons/lesson-09/examples/) · [домашка](lessons/lesson-09/homework/) |
-| 10 | Циклы, перебор и генераторы: `for...of`, протокол итератора, `function*`, `for await` | [план и словарь](lessons/lesson-10/) — выложено до занятия |
+| 10 | Циклы, перебор и генераторы: `for...of`, протокол итератора, `function*`, `for await` | [конспект](lessons/lesson-10/) · [примеры](lessons/lesson-10/examples/) · [домашка](lessons/lesson-10/homework/) |
+| 11 | Playwright: запуск и разбор падения — `yarn staging`, фильтры, ретраи, трейс, флейки | [конспект](lessons/lesson-11/) · [примеры](lessons/lesson-11/examples/) · [домашка](lessons/lesson-11/homework/) |
+| 12 | Локаторы и откуда у объекта методы — автоожидание, `isVisible`, строгий режим, выбор локатора, iframe, прототипы | [конспект](lessons/lesson-12/) · [примеры](lessons/lesson-12/examples/) · [домашка](lessons/lesson-12/homework/) |
 
 ## Соглашения в коде методичек
 
