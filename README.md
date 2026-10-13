@@ -27,6 +27,7 @@ yarn typecheck:hw5                                   # типы: домашка 
 yarn typecheck:hw6                                   # типы: домашка урока 6
 yarn typecheck:hw10                                  # типы: домашка урока 10
 yarn typecheck:hw12                                  # типы: домашка урока 12
+yarn typecheck:hw13                                  # типы: домашка урока 13
 yarn typecheck:modules                               # типы: пример про импорты
 yarn typecheck:broken                                # намеренно сломанные файлы
 
@@ -86,6 +87,8 @@ playground/        ← где набираем код: на уроке и сам
 | 10 | Циклы, перебор и генераторы: `for...of`, протокол итератора, `function*`, `for await` | [конспект](lessons/lesson-10/) · [примеры](lessons/lesson-10/examples/) · [домашка](lessons/lesson-10/homework/) |
 | 11 | Playwright: запуск и разбор падения — `yarn staging`, фильтры, ретраи, трейс, флейки | [конспект](lessons/lesson-11/) · [примеры](lessons/lesson-11/examples/) · [домашка](lessons/lesson-11/homework/) |
 | 12 | Локаторы и откуда у объекта методы — автоожидание, `isVisible`, строгий режим, выбор локатора, iframe, прототипы | [конспект](lessons/lesson-12/) · [примеры](lessons/lesson-12/examples/) · [домашка](lessons/lesson-12/homework/) |
+| 13 | Прототипы, конструкторы, классы: что делает `new`, `class` как запись, `TestRailReporter` | [конспект](lessons/lesson-13/) · [примеры](lessons/lesson-13/examples/) · [домашка](lessons/lesson-13/homework/) |
+| 14 | ООП на материале проекта: инкапсуляция, наследование, полиморфизм, абстракция — и почему наши хелперы написаны функциями | [план и словарь](lessons/lesson-14/) — выложено до занятия |
 
 ## Соглашения в коде методичек
 
