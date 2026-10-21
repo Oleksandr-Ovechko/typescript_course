@@ -37,6 +37,8 @@ yarn typecheck:hw6                типы: домашка урока 6
 yarn typecheck:hw10               типы: домашка урока 10
 yarn typecheck:hw12               типы: домашка урока 12
 yarn typecheck:hw13               типы: домашка урока 13
+yarn typecheck:hw14               типы: домашка урока 14
+yarn typecheck:hw15               типы: домашка урока 15
 yarn typecheck:modules            типы: пример с импортом между файлами
 yarn typecheck:broken             намеренно сломанные файлы
 ```

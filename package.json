@@ -13,6 +13,8 @@
     "typecheck:hw10": "tsc --noEmit -p lessons/lesson-10/homework",
     "typecheck:hw12": "tsc --noEmit -p lessons/lesson-12/homework",
     "typecheck:hw13": "tsc --noEmit -p lessons/lesson-13/homework",
+    "typecheck:hw14": "tsc --noEmit -p lessons/lesson-14/homework",
+    "typecheck:hw15": "tsc --noEmit -p lessons/lesson-15/homework",
     "typecheck:modules": "tsc -p lessons/lesson-03/examples/modules --noEmit",
     "typecheck:broken": "tsc --noEmit -p lessons/lesson-02/examples/broken"
   },
