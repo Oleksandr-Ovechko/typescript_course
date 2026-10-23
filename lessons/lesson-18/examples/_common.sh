@@ -7,7 +7,8 @@
 # Что делает: сносит и заново собирает /tmp/wl-docker-examples/<имя-папки>/runlog —
 # копию учебного приложения из lessons/lesson-18/runlog (папка называется runlog:
 # по ней docker compose называет сеть и тома). Перед примером и после него удаляет
-# контейнеры runlog и runlog-db, сеть runlog-net, тома runlog-* и runlog_*.
+# контейнеры runlog и runlog-db, сеть runlog-net, тома runlog-* и runlog_*, а после —
+# и безымянные тома, появившиеся за прогон (снимок списка томов до старта).
 # Образы node:24-alpine и postgres:18-alpine не трогает — скачает, если их нет.
 #
 # Занимает порт 3000: не запускайте, пока на нём работает что-то своё.
@@ -41,11 +42,15 @@ tty() {
 }
 wait_http() { for _ in $(seq 1 40); do curl -s -o /dev/null "$1" && return 0; sleep 0.25; done; echo "не поднялся: $1"; }
 
+anon_volumes() { docker volume ls -q | grep -E '^[0-9a-f]{64}$' | sort || true; }
+ANON_BEFORE=$(anon_volumes)
 cleanup() {
-  docker rm -f runlog runlog-db >/dev/null 2>&1 || true
+  docker rm -f -v runlog runlog-db >/dev/null 2>&1 || true
   if [ -f "$SANDBOX/runlog/compose.yaml" ]; then (cd "$SANDBOX/runlog" && docker compose down -v >/dev/null 2>&1) || true; fi
   docker network rm runlog-net >/dev/null 2>&1 || true
   docker volume rm runlog-modules runlog-pgdata >/dev/null 2>&1 || true
+  # безымянные тома (образ Postgres создаёт такой на каждый контейнер) — только появившиеся за прогон
+  comm -13 <(echo "$ANON_BEFORE") <(anon_volumes) | xargs -r docker volume rm >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 cleanup

@@ -75,6 +75,8 @@ const calls: Record<string, (page: Page) => Promise<unknown>> = {
   'waitFor()': (p) => yoga(p).waitFor().then(() => 'дождался'),
   'count()': (p) => yoga(p).count(),
   'allTextContents()': (p) => yoga(p).allTextContents(),
+  'allInnerTexts()': (p) => yoga(p).allInnerTexts(),
+  'evaluateAll()': (p) => yoga(p).evaluateAll((buttons) => buttons.length),
   'isVisible()': (p) => yoga(p).isVisible(),
   'isHidden()': (p) => yoga(p).isHidden(),
 };
@@ -93,10 +95,11 @@ run $PW test tests/who-waits.spec.ts --workers=1 2>&1 | grep -E ' → |код в
 cat <<'TEXT'
   Первые семь дождались кнопки и вернули её данные (getAttribute('type')
   вернул null — у кнопки просто нет такого атрибута, но ждал он честно).
-  Последние четыре ответили мгновенно: кнопки нет — 0, [], false, true.
+  Последние шесть ответили мгновенно: кнопки нет — 0, [], [], 0, false, true.
 
   Запоминать проще через исключения. Не ждут и отвечают «про сейчас»
-  только count(), all(), allTextContents(), isVisible() и isHidden().
+  только вызовы для списка — count(), all(), allTextContents(),
+  allInnerTexts(), evaluateAll() — и isVisible(), isHidden().
   Всё остальное у локатора ждёт, пока элемент появится.
 
   textContent() ждёт ЭЛЕМЕНТ, а не какой-то текст: текст ему никто
@@ -158,8 +161,8 @@ cat <<'TEXT'
     что ждёт                                         тайм-аут            у нас
     ───────────────────────────────────────────────  ──────────────────  ──────────────────
     весь тест целиком                                timeout             60 с
-    expect(...).toBeVisible(), toHaveText() и др.    expect.timeout      5 с (не задан —
-                                                                          умолчание)
+    expect(...).toBeVisible(), toHaveText() и др.    expect.timeout      5 с (умолчание
+                                                                          Playwright)
     click, fill, check, hover, textContent(),        actionTimeout       15 с
       waitFor() и прочие действия с элементом
     goto, reload, goBack, goForward, waitForURL      navigationTimeout   15 с
@@ -172,6 +175,9 @@ cat <<'TEXT'
   новая страница. Кликнули по клиенту — и дальше ждёт следующий шаг:
   waitForURL (по navigationTimeout) или expect на элемент профиля
   (по expect.timeout).
+
+  На медленных стендах числа больше: конфиг умножает их на
+  WL_TIMEOUT_SCALE из config/.env.<окружение> — у wl-aut-* он равен 2.
 
   Явный { timeout } в самом вызове всегда сильнее конфига.
 TEXT

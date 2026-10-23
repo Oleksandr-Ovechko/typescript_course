@@ -11,7 +11,7 @@ yarn typecheck                                       # проверить тип
 
 | Файл | Тема | О чём |
 |------|------|-------|
-| [`00-errata.ts`](00-errata.ts) | [Работа над ошибками](../README.md#работа-над-ошибками-первого-урока) | 7 примитивов и `typeof`, `strict` в tsconfig ≠ `'use strict'`, Map/Set как самостоятельные объекты, hoisting и перегрузки |
+| [`00-errata.ts`](00-errata.ts) | [Работа над ошибками](../README.md#работа-над-ошибками-первого-урока) | 7 примитивов и `typeof`, `strict` в tsconfig ≠ `'use strict'`, Map/Set как самостоятельные объекты, hoisting и перегрузки, tuple и `push` |
 | [`01-runtime-types.ts`](01-runtime-types.ts) | [Типов в рантайме нет](../README.md#типов-в-рантайме-нет) | Почему тест может пройти с ошибкой типов |
 | [`02-object-types.ts`](02-object-types.ts) | [Типы объектов](../README.md#типы-объектов) | `type`, необязательные поля, `readonly`, вложенность, функция как поле, `Record`, `type` против `interface` |
 | [`03-structural-typing.ts`](03-structural-typing.ts) | [Структурная типизация](../README.md#структурная-типизация) | TS сверяет форму, а не имя. Excess property check |

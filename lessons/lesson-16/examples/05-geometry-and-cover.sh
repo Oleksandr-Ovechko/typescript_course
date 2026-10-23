@@ -89,5 +89,10 @@ cat <<'TEXT'
 
   dispatchEvent('click') мышь не двигает: событие создаётся и
   отправляется прямо кнопке. Обработчик срабатывает — «Paid». В wl-e2e
-  так обходят перекрытые кнопки — dispatchEvent(' там тысячи.
+  dispatchEvent(' — тысячи раз, но по правилу A11 в RULES.md («A click
+  that doesn't land: fix the cause before bypassing actionability»)
+  сначала устраняют причину: оверлей загрузки — переждать, действие на
+  самом оверлее — нажать его. dispatchEvent — только «followed by an
+  assertion on the effect»: проверку «кто сверху» он пропускает.
+  force: true — только для input, спрятанного под стилизованный контрол.
 TEXT

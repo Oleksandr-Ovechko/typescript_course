@@ -47,10 +47,10 @@ console.log('8)', new RegExp(`^${escapeRegExp(passName)}$`).test('Pass (10 visit
 
 // Набор всех спецсимволов, флаг g — все, $& в замене — «то, что совпало»,
 // перед ним — \. Ровно эта функция —
-// helpers/monolith/client-profile/upcoming-schedule-page.ts:142.
-// Свою копию объявляют 389 файлов C{id}.helpers.ts из 3 394 — и это разрешено:
-// правило A9 в RULES.md, «Tier-2 may duplicate freely». Повод вынести
-// в общее место — только копии в общих хелперах (их пять).
+// helpers/monolith/client-profile/upcoming-schedule-page.ts:154.
+// Свою копию на test-generation (22.10) объявляют 377 файлов C{id}.helpers.ts
+// из 3 669 — и это разрешено: правило A9 в RULES.md, «Tier-2 may duplicate
+// freely». Повод вынести в общее место — только копии в общих хелперах (их три).
 
 // ── Всё вместе в одной строке проекта ──────────────────────────────────────
 // .../email-history/C49763.helpers.ts:530 — вырезать из HTML
@@ -83,10 +83,12 @@ console.log('10)', ['Book & pay', 'Book and Pay now', 'Book & pay later', 'Compl
 console.log('11)', 'Paid $1,234.50 Due today $20.00'.match(/(?<=\$)[\d,]+\.\d{2}/g));
 console.log('12)', 'v1.5 and 21.5'.match(/(?<![\d.])1\.5(?!\d)/g), 'v1.5 and 21.5'.match(/1\.5/g));
 
-// 11) — сумма без знака доллара: $ проверен, но в совпадение не вошёл
-//       (так в .../schedule-widget/C191581.helpers.ts:689).
+// 11) — сумма без знака доллара: $ проверен, но в совпадение не вошёл.
+//       В проекте ретроспективная проверка одна —
+//       .../schedule-widget/C191581.helpers.ts:689 (ветка test-generation):
+//       она берёт фразу «Due today …», перед которой стоит сумма.
 // 12) — «1.5 как отдельное число, а не хвост 21.5»: перед ним не цифра и
 //       не точка, после — не цифра. Так ищут часы в отчёте —
-//       .../time-clock-details/C112383.helpers.ts:929.
+//       .../time-clock-details/C112383.helpers.ts:929 (ветка test-generation).
 
 export {};

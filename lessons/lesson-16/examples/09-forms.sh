@@ -122,6 +122,7 @@ cat <<'TEXT'
   (display: none — в DOM он есть), на экране — набор div. Тест через
   evaluate выставляет значение спрятанному select и сообщает
   библиотеке: change и chosen:updated — своё событие Chosen.
-  helpers/monolith/setup/services/appointment-setup-page.ts:457-465,
-  class-period-edit-page.ts:33-39.
+  helpers/monolith/setup/services/appointment-setup-page.ts:458-466
+  (через jQuery: $(el).trigger('chosen:updated')),
+  class-period-edit-page.ts:33-39 (dispatchEvent(new Event(…))).
 TEXT

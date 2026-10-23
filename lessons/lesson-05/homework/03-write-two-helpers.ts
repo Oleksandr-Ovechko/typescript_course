@@ -26,7 +26,7 @@ const neverAppears = (): FakeLocator => ({
 // ── А. elementExists ───────────────────────────────────────────────────────
 //
 // Написать функцию, которая превращает «бросил или не бросил» в true/false.
-// Это идиом из 347 файлов проекта:
+// Это идиом из полутора тысяч файлов проекта (на 22.10.2026):
 //
 //   const hasAgreementToSign = await page
 //     .locator('button.js-button-sign')
@@ -50,24 +50,23 @@ async function elementExists(locator: FakeLocator): Promise<boolean> {
 // Написать функцию, которая ставит два ожидания в гонку и возвращает имя того
 // экрана, который появился первым. Модель настоящего кода:
 //
-//   // projects/widgets/setup-run/001-default-business/default-business.helpers.ts:21
+//   // projects/widgets/setup-run/001-default-business/default-business.helpers.ts:41
 //   const destination = await Promise.race([
 //     page.locator('button.js-button-sign').waitFor({ state: 'visible' }).then(() => 'agreement' as const),
-//     page.getByText('Add Payment Method').waitFor({ state: 'visible' }).then(() => 'store-settings' as const),
+//     page.getByText('Add Payment Method', { exact: true }).waitFor({ state: 'visible' }).then(() => 'store-settings' as const),
 //   ]);
 //
 // Условия:
 //   · вернуть 'agreement' или 'store-settings' — что появилось первым
 //   · тип результата — именно union из двух строк, а НЕ Promise<string>.
-//     Если получится string, проверка типов внизу файла упадёт — так и задумано
+//     Тип возврата у функции намеренно не написан: он выводится из тела.
+//     Забыли as const — вывелся string, и проверка типов внизу файла
+//     не скомпилируется (TS2322) — так и задумано
 //   · as const — с урока 2
 //
-// Замените throw своей реализацией.
-async function whichScreen(
-  agreement: FakeLocator,
-  storeSettings: FakeLocator,
-): Promise<'agreement' | 'store-settings'> {
-  throw new Error('задание Б ещё не сделано');
+// Замените return своей реализацией.
+async function whichScreen(agreement: FakeLocator, storeSettings: FakeLocator) {
+  return Promise.reject(new Error('задание Б ещё не сделано'));
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -97,13 +96,11 @@ check('Б. первым появился store-settings', first === 'store-setti
 const second = await whichScreen(appearsIn(10), appearsIn(60)).catch((error: Error) => `бросило: ${error.message}`);
 check('Б. первым появился agreement', second === 'agreement', second);
 
-// Проверка типа, а не значения: строка ниже обязана давать ошибку компиляции.
-// Если whichScreen объявлена как Promise<string>, ошибки не будет — и тогда
-// упадёт сам @ts-expect-error (TS2578: Unused '@ts-expect-error' directive).
-const screen = await whichScreen(appearsIn(10), appearsIn(60));
-// @ts-expect-error — TS2367: 'store' не входит в union из двух строк
-const typeIsNarrow: boolean = screen === 'store';
-void typeIsNarrow;
+// Проверка типа, а не значения. Если whichScreen возвращает string (забыли
+// as const или написали Promise<string>), строка ниже не скомпилируется:
+// TS2322: Type 'string' is not assignable to type '"agreement" | "store-settings"'.
+const screen: 'agreement' | 'store-settings' = await whichScreen(appearsIn(10), appearsIn(60));
+void screen;
 
 if (failures.length > 0) {
   throw new Error(`ещё не сделано: ${failures.join(' · ')}`);

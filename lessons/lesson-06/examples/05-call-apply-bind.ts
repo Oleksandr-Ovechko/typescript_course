@@ -86,7 +86,8 @@ console.log('7)', describeMonolith('{', '}'));
 // ── Где это встречается в wl-e2e ──────────────────────────────────────────
 // Писать call и bind самим вам почти не придётся, а вот узнавать — постоянно:
 // в исходниках библиотек, в примерах со Stack Overflow, в том, что предлагает
-// Клод. И в своём коде тоже — там их три места.
+// Клод. И в своём коде тоже: на момент урока — три места, к 22.10.2026 —
+// десятки, почти все вида setter.call(el, val). Вот два первых.
 //
 // projects/monolith/tests/regression-run/setup-store-configuration/suppliers/
 // C21564.helpers.ts:162 — метод оторвали от объекта, this вернули через bind:
@@ -102,7 +103,7 @@ console.log('7)', describeMonolith('{', '}'));
 // оторван от mpNote, и его this потерялся бы ровно так же, как orphan
 // в файле 04.
 //
-// projects/widgets/end-to-end-tests/schedule-widget/C85303.helpers.ts:137 —
+// projects/widgets/end-to-end-tests/schedule-widget/C85303.helpers.ts:134 —
 // функцию одолжили у прототипа:
 //
 //   const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!;

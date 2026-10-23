@@ -5,8 +5,9 @@
  * Что здесь: `type` · необязательные поля `?` · `readonly` · вложенность
  * и массивы объектов · функция как поле · `Record` · `type` против `interface`.
  *
- * Типы SessionIdentity, LoginOpts и CachedLoginOpts — настоящие, из
- * helpers/utils/session-store.ts и helpers/monolith/wl-login-helper.ts.
+ * Типы SessionIdentity, LoginOpts и CachedLoginOpts — упрощённые версии настоящих
+ * из helpers/utils/session-store.ts и helpers/monolith/wl-login-helper.ts:
+ * `Page` заменён на `string`, промисы убраны, лишние поля опущены.
  */
 
 // ── Именованный тип (type alias) ───────────────────────────────────────────

@@ -32,6 +32,7 @@ node lessons/.../examples/X.ts    запустить пример
 yarn typecheck                    типы: playground + examples
 yarn typecheck:hw2                типы: домашка урока 2
 yarn typecheck:hw3                типы: домашка урока 3
+yarn typecheck:hw4                типы: домашка урока 4
 yarn typecheck:hw5                типы: домашка урока 5
 yarn typecheck:hw6                типы: домашка урока 6
 yarn typecheck:hw10               типы: домашка урока 10
@@ -105,6 +106,7 @@ Yarn 1, она перехватывает одноимённый скрипт.
 - **`set -e` и локальный `git config`** — падать на первой же ошибке
   и не зависеть от глобальных настроек читателя.
 
-Проверяются они не `tsc`, а запуском: `bash lessons/lesson-08/examples/*.sh`
+Проверяются они не `tsc`, а запуском: `for f in lessons/lesson-08/examples/*.sh; do bash "$f"; done`
+(не `bash …/*.sh` — так запустится только первый файл, остальные уйдут ему аргументами)
 должен отработать с нулевым кодом возврата, а объяснения внутри — совпадать
 с настоящим выводом.

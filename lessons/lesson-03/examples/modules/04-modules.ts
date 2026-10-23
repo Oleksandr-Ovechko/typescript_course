@@ -5,8 +5,8 @@
  * `as` · относительный путь против голого · что на самом деле значит `@` ·
  * почему одноимённые функции из разных файлов не конфликтуют.
  *
- *   node lessons/lesson-03/examples/04-modules.ts
- *   yarn typecheck
+ *   node lessons/lesson-03/examples/modules/04-modules.ts
+ *   yarn typecheck:modules
  *
  * Импортируется из соседнего `04-modules-helper.ts` — это настоящий импорт,
  * а не имитация: удалите там `export` у любого имени и посмотрите на ошибку.
@@ -19,8 +19,8 @@ import { DEFAULT_TIMEOUT, buildProfileUrl } from './04-modules-helper.ts';
 
 // ── Переименование через as ────────────────────────────────────────────────
 // Нужно, когда из разных файлов приезжают одноимённые функции. В `wl-e2e` это
-// не редкость: `clickSaveButton` экспортируется из четырёх разных хелперов,
-// а `as` в импортах встречается в десяти файлах.
+// не редкость: `clickSaveButton` экспортируется из пяти разных хелперов
+// (ветка draft), а `as` в импортах встречается больше чем в сотне файлов.
 import { login as loginFromHelper } from './04-modules-helper.ts';
 
 // ── Импорт по умолчанию ────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ console.log('своя login():', login(), '| чужая:', loginFromHelper());
 // пакет монорепы лежит в `node_modules` ровно так же. Проверяется одной командой
 // в корне `wl-e2e`:
 //
-//   $ ls -la node_modules | grep wl-e2e
+//   $ ls -la node_modules | grep wl-e2e-automation
 //   wl-e2e-automation-helpers -> ../helpers
 //
 // Yarn положил туда симлинк на папку `helpers/`. Правило простое: путь

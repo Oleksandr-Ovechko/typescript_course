@@ -47,7 +47,7 @@ console.log({ ...base, locale: 'ua' }.locale);   // →
 // А эту строку компилятор не пропускает:
 //     ❌ TS2783: 'locale' is specified more than once, so this usage will be overwritten
 // console.log({ locale: 'ua', ...base }.locale);
-//
+
 // ВОПРОС. Что напечаталось бы, если бы компилятор её пропустил? Почему он вообще
 // счёл нужным предупредить — ведь синтаксически строка корректна?
 //
@@ -55,7 +55,7 @@ console.log({ ...base, locale: 'ua' }.locale);   // →
 
 // ЗАДАНИЕ. Ниже функция, которая должна вернуть настройки с выключенным
 // headless, НЕ трогая исходный объект. Сейчас она это правило нарушает.
-// Найдите где и почините — так, чтобы `assert` в конце прошёл.
+// Найдите где и почините — так, чтобы проверка в конце (`throw`) не сработала.
 function withHeadlessOff(config: RunConfig): RunConfig {
   const copy = { ...config };
   copy.browser.headless = false;

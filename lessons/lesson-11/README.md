@@ -71,15 +71,18 @@ cd /tmp/wl-pw-examples/…    # песочница остаётся — захо
 **6. `--max-failures N` — «остановить прогон после N падений».**
 К ретраям отношения не имеет.
 
-**7. `expect.soft` в проекте используется** — 51 вызов в 34 файлах.
-Теги — почти нигде: `@flaky` в пяти тестах.
+**7. `expect.soft` в проекте используется** — десятки вызовов (на `draft`
+в октябре 2026 — 60 в 26 файлах), и все в регрессионных тестах `monolith`
+и `widgets`, в `setup-run` — ни одного. Теги — почти нигде: `@flaky` в пяти
+тестах.
 
 **8. `error-context.md` пишется только для упавших попыток.** У прошедших
 тестов папки в `test-results/` нет вовсе.
 
 **9. Большие тайм-ауты в тестах — не часы, а минуты.** `2_700_000` мс —
-45 минут, самый большой в проекте — 80 минут. Самый частый из больших —
-30 минут, у 247 тестов.
+45 минут, самый большой в проекте — 80 минут (`4_800_000`, один тест на
+`test-generation`). Чаще всего из больших встречаются 10 и 15 минут
+(`600_000`, `900_000`) — их сотни.
 
 **10. Проверки `expect(...)` ждут по `expect.timeout` (5 с), а не по
 `actionTimeout` (15 с).** `actionTimeout` — для действий: клик, `fill`.
@@ -91,6 +94,23 @@ cd /tmp/wl-pw-examples/…    # песочница остаётся — захо
 `test-debugger.md`, а не в `RULES.md`. JSON-репортер на `draft` всё-таки
 используется — его включает `regression-lane.ts`. Имя видео
 `page@<id>.webm` — идентификатор страницы, а не пометка «гость».
+
+**13. `yarn case` — не ярлык на заранее выбранный `.env`.** Скрипт
+`scripts/run-case.mjs` сам находит спек кейса и нужный конфиг, а окружение
+берёт из флага `--env=…`, иначе из журнала генерации
+(`generation/results/run-summary.tsv`), иначе — `staging`. Подробно — урок 17.
+
+**14. Один ретрай стоит не везде.** `retries: 1` — в базовом
+`playwright.config.ts`; у `playwright.e2e.config.ts` и
+`playwright.setup.config.ts` — `retries: 0`.
+
+**15. `файл:строка` — не часть регулярки.** Номер строки Playwright отрезает
+и проверяет отдельно: в пути `tests/booking.spec.ts` никакого `:8` нет,
+а `--list tests/booking.spec.ts:8` тест находит.
+
+**16. Порядок выбора локатора — сначала роль, а не `id`.** Выбор по `#id` —
+это CSS-локатор, он в конце списка: правило S3 в `RULES.md` ставит
+`getByRole` / `getByLabel` / data-атрибуты впереди CSS. Подробно — урок 12.
 
 ---
 
@@ -138,6 +158,11 @@ APP_ENV=demo yarn playwright test --list C93 --project=chromium   # Total: 5 tes
    (`chromium`, `firefox`, `webkit`), и без `--project` каждый тест идёт
    в каждом. Поэтому во всех инструкциях проекта стоит `--project=chromium`.
 
+Числа — замер 2026-09-18; файлов под `C93` с тех пор стало больше (в октябре:
+6 на `draft`, 12 на `test-generation`), а смысл тот же. `APP_ENV=demo` здесь
+годится, хотя файла `config/.env.demo` в `widgets` нет вовсе: `--list` не
+запускает тесты и не вызывает `globalSetup`, ему окружение не нужно.
+
 Точная запись для одного кейса — `yarn staging C2358.spec --project=chromium`.
 
 Остальные формы фильтра:
@@ -145,7 +170,7 @@ APP_ENV=demo yarn playwright test --list C93 --project=chromium   # Total: 5 tes
 | Запись | Что выберет |
 |---|---|
 | `tests/booking.spec.ts` | все тесты файла |
-| `tests/booking.spec.ts:8` | тест, который **начинается** на строке 8. Строка внутри теста — «No tests found» |
+| `tests/booking.spec.ts:8` | тест, который **начинается** на строке 8. Строка внутри теста — «No tests found». `:8` — не часть регулярки: номер строки проверяется отдельно |
 | `regression-run/appointment-widget` | все тесты папки, с подпапками |
 | `-g "Yoga"` | тесты, в **имени** которых есть `Yoga` (тоже регулярка) |
 | без аргумента | весь проект |
@@ -194,7 +219,7 @@ test.describe.configure({ mode: 'serial' });
 ```
 
 «Тесты этого `describe` — в один воркер, по очереди; упал один — остальные
-пропустить». В проекте так написано 380 файлов.
+пропустить». В проекте так написаны сотни файлов.
 
 Зачем: тесты делят **состояние** — один бизнес, одна карточка клиента, одни
 настройки. Если два теста одновременно пополняют и списывают баланс или
@@ -228,20 +253,24 @@ test.describe.configure({ mode: 'serial' });
 | `testDir` | `'./tests'` | где искать спеки |
 | `fullyParallel` | `true` | единица параллельности — тест |
 | `forbidOnly` | `!!process.env.CI` | забытый `test.only` валит прогон на CI; локально — нет |
-| `retries` | `1` | один повторный запуск упавшего теста |
-| `workers` | `8` | потолок процессов (`CI ? 8 : 8` — тернарник, который ничего не выбирает) |
-| `reporter` | `[['list'], ['allure-playwright']]` | что печатать и что складывать. В `monolith` третьим — свой TestRail-репортер |
+| `retries` | `1` | один повторный запуск упавшего теста (`CI ? 1 : 1` — тернарник, который ничего не выбирает) |
+| `workers` | `parallelWorkers()` | потолок процессов: `WL_WORKERS`, если задана, иначе 8 |
+| `reporter` | `list`, `allure-playwright`, TestRail, `laneReporters` | что печатать и что складывать. TestRail-репортер общий для `monolith` и `widgets` (`helpers/utils/testrail-reporter.ts`), включается `-- --testrail` или `TESTRAIL_ENABLED=true` |
 | `use.baseURL` | `WL_UI_BASE_URL` из `.env` | `page.goto('/rs/…')` достраивается от него |
-| `use.actionTimeout` | `15_000` | потолок одного действия |
-| `use.navigationTimeout` | `15_000` | потолок перехода |
+| `use.actionTimeout` | `scaledTimeout(15_000)` | потолок одного действия |
+| `use.navigationTimeout` | `scaledTimeout(15_000)` | потолок перехода |
 | `use.trace` | `'on-first-retry'` | трейс пишется только на ретрае |
-| `timeout` | `60_000` | потолок теста целиком |
-| `expect.timeout` | не задан → `5_000` | потолок одной проверки |
+| `timeout` | `scaledTimeout(60_000)` | потолок теста целиком |
+| `expect.timeout` | `scaledTimeout(5_000)` | потолок одной проверки. 5 с — и умолчание Playwright; записано явно, чтобы его тоже растягивал `WL_TIMEOUT_SCALE` |
 | `projects` | chromium, firefox, webkit | три браузера. У chromium явно `viewport: 1280×800` — умолчание было бы 1280×720 |
 | `globalSetup` | `'./globalSetup'` | один раз до всех тестов: проверяет, что переменные окружения на месте |
 
+`scaledTimeout(n)` — это `n`, умноженное на `WL_TIMEOUT_SCALE` из
+`config/.env.<имя>` (`helpers/utils/timeout-scale.ts`); без переменной — ровно `n`.
+
 Чего в конфиге нет — и что поэтому не появляется само: `video`,
-`screenshot`, HTML-репортер, `storageState`, `webServer`.
+`screenshot`, HTML-репортер, `storageState`, `webServer`. В `monolith`
+скриншот включён: `screenshot: 'only-on-failure'`.
 
 Репортеры, которые умеет Playwright:
 
@@ -251,10 +280,10 @@ test.describe.configure({ mode: 'serial' });
 | `line` | одна перезаписываемая строка | — |
 | `dot` | точка на тест — для больших прогонов | умолчание на CI |
 | `html` | сайт с отчётом | в `explorer` — да (`open: 'never'`); в `monolith` и `widgets` — нет, включается своим конфигом или `--reporter=html` |
-| `json`, `junit` | файл для других программ | `json` — на `draft`, через `regression-lane.ts` |
+| `json`, `junit` | файл для других программ | `json` — через `regression-lane.ts`, когда задана `WL_LANE_REPORT_DIR` |
 | `blob` | сырьё для `merge-reports` | — |
 | `github` | аннотации в GitHub Actions | — |
-| свой | любой код | `allure-playwright`, TestRail в `monolith` |
+| свой | любой код | `allure-playwright`, TestRail в `monolith` и `widgets` |
 
 ### Четыре тайм-аута
 
@@ -286,7 +315,7 @@ test.slow();                               // утраивает тайм-аут
 expect(locator).toBeVisible({ timeout: 30_000 });   // только для этой проверки
 ```
 
-В проекте `test.setTimeout(` встречается больше пяти тысяч раз — то есть
+В проекте `test.setTimeout(` встречается тысячи раз — то есть
 настоящий тайм-аут теста чаще записан в самом тесте, чем в конфиге.
 Прежде чем спорить с конфигом, посмотрите в начало спека.
 
@@ -307,10 +336,11 @@ expect(locator).toBeVisible({ timeout: 30_000 });   // только для эт�
 Все они — `...base` плюс отличия: конфиг — обычный модуль, и его можно
 расширить спредом, как любой объект (урок 3).
 
-На `draft` добавились `playwright.probe.config.ts`, `playwright.verify.config.ts`
-и общий модуль `helpers/utils/regression-lane.ts`: он читает `WL_LANE`,
-`WL_WORKERS`, `WL_LANE_REPORT_DIR`, а у widgets — `WL_TIMEOUT_SCALE`, который
-множит тайм-ауты на медленном стенде.
+Ещё есть `playwright.probe.config.ts`, `playwright.verify.config.ts`
+и два общих модуля: `helpers/utils/regression-lane.ts` читает `WL_LANE`,
+`WL_WORKERS`, `WL_LANE_REPORT_DIR`, а `helpers/utils/timeout-scale.ts` —
+`WL_TIMEOUT_SCALE`, который множит тайм-ауты на медленном стенде (им
+пользуются конфиги и `widgets`, и `monolith`).
 
 ---
 
@@ -329,7 +359,8 @@ test-results/booking-book-Pilates-chromium-retry1/trace.zip
 
 - У **первой** попытки трейса нет — только `error-context.md`.
 - Трейс — **в папке с `-retry1`** на конце.
-- Видео и скриншота нет: проект их не включал.
+- Видео и скриншота нет: в `widgets` их не включали (в `monolith` скриншот
+  упавшей попытки есть — `screenshot: 'only-on-failure'`).
 - У прошедших тестов папок нет.
 - `test-results/` **перезаписывается** каждым прогоном — нужное забирайте
   сразу.
@@ -443,7 +474,8 @@ pw trace open test-results/…/trace.zip   # открыть; дальше пут
 pw trace actions                         # список действий с длительностью
 pw trace console                         # консоль страницы
 pw trace requests                        # сеть
-pw trace action 7                        # одно действие подробно, с Log
+pw trace action 9                        # одно действие подробно, с Log;
+                                         # номер — из вывода trace actions
 pw trace close                           # закрыть
 ```
 
@@ -474,8 +506,11 @@ pw trace close                           # закрыть
 `openEmbeddedWidgetAsGuest` в `projects/widgets/helpers/components/widgets-navigation.ts`:
 
 ```ts
-const guestContext = await browser.newContext();
+const guestContext = await browser.newContext(contextOptions);
 ```
+
+`contextOptions` — необязательный четвёртый параметр хелпера; большинство
+тестов его не передаёт, и контекст создаётся с настройками по умолчанию.
 
 Этот контекст создан руками, фикстура о нём не знает — **`use.video` его
 не пишет**. На видео будет пустая страница сотрудника и ничего из того,
@@ -495,14 +530,19 @@ const guestContext = await browser.newContext(
 контексты надо закрывать. В одно видео их не склеить — это уже работа
 для отдельной программы.
 
-В `wl-e2e` для этого есть локальный `playwright.video.config.ts`
-(`video: 'on'`, `outputDir` из `WL_VIDEO_DIR`). Две вещи, которые важно
-помнить:
+Готового конфига записи (`video: 'on'`, `outputDir` из `WL_VIDEO_DIR`)
+в `wl-e2e` нет ни в одной ветке — его собирают по образцу
+`playwright.video.config.ts` из примера 06 и прячут через
+`.git/info/exclude`. Две вещи, которые важно помнить:
 
-- `widgets-navigation.ts` — хелпер Tier-1, и он заморожен. Правка
-  с `recordVideo` в нём — только локально: записали видео — откатили
-  (`git checkout -- <файл>`) и проверили, что `git diff` по хелперам пуст.
-  Если правило для этого файла поменяется, об этом объявят отдельно.
+- `widgets-navigation.ts` — хелпер Tier-1, и он заморожен (A9). Править
+  его для записи не нужно: `openEmbeddedWidgetAsGuest` принимает опции
+  контекста четвёртым аргументом, и `recordVideo` добавляют туда в своём
+  спеке или `C{id}.helpers.ts`:
+  `openEmbeddedWidgetAsGuest(browser, html, false, { recordVideo: { dir: … } })`.
+  Если тест уже передаёт опции (`viewport`, `timezoneId`), `recordVideo`
+  дописывают в тот же объект. Исключение — `openScheduleWidgetAsGuest`: её
+  `newContext()` без параметров.
 - Записывать только зелёные прогоны: видео пишется и для упавшего теста.
 
 Пример — [`06-video-contexts.sh`](examples/06-video-contexts.sh).
@@ -531,6 +571,11 @@ exit=0
 Флейки разбирают **своим конфигом** — `retries: 0`,
 `trace: 'retain-on-failure'`: тогда трейс будет у самого падения.
 
+Редкое падение ловят повтором: `--repeat-each=10` прогонит тест десять раз.
+Со своим конфигом трейс останется у каждого упавшего повтора: у первого —
+в обычной папке теста, у следующих — в папках с `-repeat1`, `-repeat2`…
+на конце.
+
 Почему в проекте `retries: 1`: стенд общий, и случайное замедление не должно
 валить весь прогон. Цена — флейки прячутся.
 
@@ -546,14 +591,14 @@ exit=0
 |---|---|---|
 | Теги `{ tag: '@smoke' }` и `--grep @smoke` | `@flaky` в пяти тестах; наборы разделены папками | гонять срез по метке: флейки, медленные, создающие клиентов |
 | `projects` + `dependencies` + `storageState` | свои сессии в `session-store.ts` — из-за особенностей логина в монолит | проект `setup` логинится и сохраняет сессию, остальные объявляют его зависимостью |
-| `getByTestId` + `testIdAttribute` | 1 вызов против 17 000 `getByRole` | если в вёрстке есть `data-testid`, локатор не ломается от перевода и вёрстки |
-| `expect.soft(...)` | 51 вызов; правило **S4** — только для «структурных» проверок, главный сценарий проверяется строго | проверить пять полей и увидеть **все** несовпадения разом |
+| `getByTestId` + `testIdAttribute` | 1 вызов против больше чем десяти тысяч `getByRole` | если в вёрстке есть `data-testid`, локатор не ломается от перевода и вёрстки |
+| `expect.soft(...)` | десятки вызовов; правило **S4** — только для «структурных» проверок, главный сценарий проверяется строго | проверить пять полей и увидеть **все** несовпадения разом |
 | `toHaveScreenshot` | 1 | сравнение картинок для вёрстки |
 | `--shard=1/4` + `merge-reports` | — | разложить регрессию на несколько машин и склеить отчёт |
 | `--only-changed`, `--last-failed`, `--max-failures N`, `-x` | — | быстрые круги при починке: только изменённое, только упавшее, стоп после N падений |
 
-Уже используется, и стоит знать по имени: `test.step` (1 677 вызовов) —
-шаги видны в трейсе и отчёте отдельными строками; `expect.poll` (627) —
+Уже используется, и стоит знать по имени: `test.step` (больше полутора тысяч вызовов) —
+шаги видны в трейсе и отчёте отдельными строками; `expect.poll` (сотни) —
 дождаться меняющегося значения без `waitForTimeout`; `test.info().attach` —
 положить свой файл в отчёт.
 
@@ -613,11 +658,13 @@ yarn allure:open
 
 | Файл | Что внутри | В git |
 |---|---|---|
-| `.env.<имя>` | публичное: базовые адреса, адреса логина, ID бизнесов | да |
-| `.env.<имя>.secure` | секретное: логины, пароли, ключи | **нет** |
+| `.env.<имя>` | публичное: базовые адреса, адреса логина, slug бизнеса | да |
+| `.env.<имя>.secure` | секретное: логины, пароли, ключи, ID бизнеса (`WL_UI_BUSINESS_ID`) | **нет** |
 
 Какой из них читать, решает `APP_ENV`: `yarn staging` — это
-`APP_ENV=staging`, `yarn dev` — `APP_ENV=demo`, и так далее. Свой стенд —
+`APP_ENV=staging`, `yarn dev` — `APP_ENV=demo` (в `widgets` файла
+`.env.demo` нет — там `yarn dev` идёт на адреса по умолчанию без учётки),
+и так далее. Свой стенд —
 `APP_ENV=staging-exp3 yarn playwright test …`.
 
 Если `.secure`-файла нет, **ошибки не будет** — конфиг молча поедет без
@@ -630,7 +677,7 @@ yarn allure:open
 ломается, когда меняется вёрстка, а роль, подпись и текст — нет.
 
 `getByRole` **ждёт так же, как любой локатор** — автоожидание одно для всех.
-Если он «не находит», причина почти всегда одна из двух:
+Если он «не находит», причина почти всегда одна из трёх:
 
 - **`name` не совпал.** По умолчанию `name` — подстрока без учёта регистра:
   `{ name: 'book yoga' }` найдёт «Book Yoga». `exact: true` — только точное
@@ -644,7 +691,7 @@ yarn allure:open
   В тексте ошибки Playwright сам подсказывает точные локаторы строками
   `aka getByRole(…)`.
 
-Какие локаторы предпочтительны у нас — правило **S3** в `wl-e2e/CONVENTIONS.md`:
+Какие локаторы предпочтительны у нас — правило **S3** в `wl-e2e/RULES.md`:
 `getByRole`, `getByLabel`, data-атрибуты; XPath запрещён. Клод это правило
 читает — это ответ на вопрос «можно ли заставить его выбирать устойчивые
 локаторы». Подробно — урок 12.

@@ -20,7 +20,12 @@ const pause = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 //   for (let attempt = 0; attempt < 3; attempt++) {
 //     await searchInput.fill(clientData);
 //     await searchInput.press('Enter');
-//     if (await resultItem.isVisible({ timeout: 5_000 }).catch(() => false)) {
+//     if (
+//       await resultItem
+//         .waitFor({ state: 'visible', timeout: 5_000 })
+//         .then(() => true)
+//         .catch(() => false)
+//     ) {
 //       break;
 //     }
 //   }
@@ -43,7 +48,7 @@ console.log('2) нашли:', found);
 // Третьей попытки не было: вышли по break раньше, чем условие стало ложным.
 // `let`, а не `const`, — потому что attempt++ меняет переменную.
 //
-// Потолок обязателен (правило W5): цикл без него не падает, а зависает,
+// Потолок обязателен (правило W7, пункт b, в RULES.md): цикл без него не падает, а зависает,
 // и тест умирает по общему таймауту с бесполезным сообщением.
 
 // ── Цикл без счётчика ─────────────────────────────────────────────────────

@@ -115,7 +115,7 @@ console.log('5)', Object.keys(new SilentReporter()), typeof shaped.onEnd, typeof
 //     onBegin(_config: FullConfig, suite: Suite) { … }
 //     onTestEnd(test: TestCase, result: TestResult) { … }
 //     async onEnd() { … }
-//     …и одиннадцать private-методов: внутренняя кухня
+//     …и тринадцать private-методов: внутренняя кухня
 //   }
 //   export default TestRailReporter;
 //
@@ -133,11 +133,11 @@ console.log('5)', Object.keys(new SilentReporter()), typeof shaped.onEnd, typeof
 //
 // Playwright сам импортирует файл, берёт export default и делает
 // new TestRailReporter(). Он создаётся при каждом прогоне — но работает,
-// только если TESTRAIL_ENABLED=true и заданы доступы; иначе печатает одну
-// строку и молчит. Это то самое поле enabled = false.
+// только если его включили (флаг -- --testrail или TESTRAIL_ENABLED=true)
+// и заданы доступы; иначе печатает одну строку и молчит. Это то самое поле enabled = false.
 //
 // Флаг --reporter=… в командной строке ЗАМЕНЯЕТ весь список из конфига:
 // с ним TestRail-репортер не запустится вовсе. Если флага нет и в конфиге
-// репортеров нет, Playwright берёт list.
+// репортеров нет, Playwright берёт list (на CI — dot).
 
 export {};

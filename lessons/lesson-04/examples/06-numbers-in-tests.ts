@@ -18,7 +18,7 @@
 const fromReport = ['$1,234.56', '19.99 USD', '  0.10\n', '$0.00'];
 
 // ── Как это делает wl-e2e ──────────────────────────────────────────────────
-// helpers/monolith/store/store-page.ts:52
+// helpers/monolith/store/store-page.ts:99
 //
 //   export async function extractPrice(locator: Locator): Promise<number> {
 //     const text = await locator.evaluate((el) => el.getAttribute('data-amount') || el.textContent || '');
@@ -58,7 +58,7 @@ const second = 20.2;
 console.log('сумма    :', first + second); // 30.299999999999997
 console.log('=== 30.3 :', first + second === 30.3); // false
 
-// В Playwright для этого есть toBeCloseTo — 53 вхождения в wl-e2e.
+// В Playwright для этого есть toBeCloseTo — сотни вхождений в wl-e2e.
 // Внутри там ровно одна строка (playwright/lib/matchers/expect.js):
 //   pass = Math.abs(expected - received) < Math.pow(10, -precision) / 2
 function toBeCloseTo(received: number, expected: number, precision = 2): boolean {
@@ -73,7 +73,7 @@ console.log('и она не всеядна  :', toBeCloseTo(30.31, 30.3)); // fa
 //     .toBeCloseTo(orderTotal, 2);
 //   projects/monolith/tests/regression-run/app-drawer-store/store-main/C50360.spec.ts:90
 //
-// А сама sumAmounts (тот же тест, C50360.helpers.ts:339) складывает СТРОКИ,
+// А сама sumAmounts (тот же тест, C50360.helpers.ts:340) складывает СТРОКИ,
 // снятые со страницы:
 //
 //   export function sumAmounts(values: string[]): number {

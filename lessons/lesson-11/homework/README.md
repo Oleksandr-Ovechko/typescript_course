@@ -181,24 +181,21 @@ bash lessons/lesson-11/examples/06-video-contexts.sh
 создаются в общем хелпере:
 
 ```bash
-git -C ~/work/wl-e2e grep -n 'browser.newContext' origin/autonomous-test-gen-experiment -- projects/widgets/helpers/components/widgets-navigation.ts
-```
-
-На рабочей ветке — два вызова, строки 109 и 448. На `origin/draft` те же
-вызовы сдвинулись (141 и 492), и первый уже принимает `contextOptions` —
-посмотрите сами:
-
-```bash
 git -C ~/work/wl-e2e grep -n 'browser.newContext' origin/draft -- projects/widgets/helpers/components/widgets-navigation.ts
 ```
+
+Вызовов два: в `openEmbeddedWidgetAsGuest` — `browser.newContext(contextOptions)`,
+в `openScheduleWidgetAsGuest` — `browser.newContext()` без параметров. Номера
+строк возьмите из вывода: при правках хелпера они сдвигаются.
 
 Ответьте своими словами: **почему `use.video` из конфига не записывает
 эти контексты** и что нужно передать в `newContext`, чтобы записал. Слово
 «фикстура» в ответе обязательно.
 
-> ⚠️ `widgets-navigation.ts` — общий хелпер (Tier-1), он заморожен.
-> Правку для записи видео в нём не коммитят: записали — откатили
-> `git checkout -- <файл>`.
+> ⚠️ `widgets-navigation.ts` — общий хелпер (Tier-1), он заморожен (A9).
+> Править его для записи видео не нужно: `openEmbeddedWidgetAsGuest`
+> принимает опции контекста четвёртым аргументом — `recordVideo` передают
+> туда из своего спека.
 
 ---
 
@@ -214,8 +211,11 @@ git -C ~/work/wl-e2e grep -n 'browser.newContext' origin/draft -- projects/widge
 | `use.navigationTimeout` | | |
 | `timeout` | | |
 
-Один из четырёх в конфиге **не задан** — какое значение тогда действует
-и откуда оно берётся?
+Если значения обёрнуты в `scaledTimeout(...)` (так в `widgets`), — что эта
+функция делает (`helpers/utils/timeout-scale.ts`) и при каком условии
+значение будет другим? Задан ли в вашем конфиге `expect.timeout` (в `widgets`
+задан, в `monolith` на `test-generation` — нет)? Если не задан — какое
+значение действует и откуда оно берётся?
 
 Какой тайм-аут сработает, если:
 
@@ -239,8 +239,7 @@ cd ~/work/wl-e2e && node -e "const {devices}=require('@playwright/test'); consol
 
 ## 7. Заменить один локатор
 
-Правило проекта — **S3** в `CONVENTIONS.md` (раздел «The complete rule
-set», строка 133): семантические локаторы — `getByRole`, `getByLabel`,
+Правило проекта — **S3** в `RULES.md` (раздел 5): семантические локаторы — `getByRole`, `getByLabel`,
 data-атрибуты; без XPath, без `nth-child`, без слепых `.first()`/`.last()`.
 Порядок предпочтения расписан в `projects/widgets/.claude/agents/code-generator.md`,
 раздел «Locator Strategy (priority order)»: `getByRole` → `getByText` →

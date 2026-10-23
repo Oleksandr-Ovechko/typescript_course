@@ -40,13 +40,15 @@ await expect(listRow).toBeVisible({ timeout: 30_000 });
 - **г.** Последняя строка хелпера снова ждёт `listRow` — те же тридцать секунд.
   Выглядит как дубль. Почему её нельзя убрать?
 
-### 2. Десять `new Promise` на весь проект
+### 2. `new Promise` на весь проект
 
 ```bash
 git grep -n "new Promise" origin/draft -- '*.ts'
 ```
 
-- **а.** Сколько нашлось? Выпишите файлы.
+- **а.** Сколько нашлось? Сколько из них — одна и та же пауза
+  `new Promise((resolve) => setTimeout(resolve, ms))`? Выпишите те, что
+  делают что-то другое.
 - **б.** Откройте
   `projects/widgets/tests/regression-run/customization/C56888.helpers.ts`,
   строка 155. Что делает эта строка? Своими словами, одним предложением.
@@ -54,7 +56,7 @@ git grep -n "new Promise" origin/draft -- '*.ts'
   Что вообще заворачивают в `new Promise` вручную, а что достаётся уже
   завёрнутым от Playwright?
 
-### 3. Девятьсот пятьдесят заглушённых ошибок
+### 3. Тысячи заглушённых ошибок
 
 ```bash
 git grep -c "catch(() => undefined)" origin/draft -- '*.ts' | head -20
@@ -87,7 +89,7 @@ const [newTab] = await Promise.all([page.context().waitForEvent('page'), cta.cli
 
 ### 5. Проверить линтер своими руками
 
-На уроке прозвучало, что забытый `await` в проекте не ловит ни компилятор,
+В конспекте сказано, что забытый `await` в проекте не ловит ни компилятор,
 ни линтер. Проверьте сами — не верьте на слово:
 
 ```bash

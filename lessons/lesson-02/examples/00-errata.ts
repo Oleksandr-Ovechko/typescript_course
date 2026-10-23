@@ -2,7 +2,8 @@
  * Урок 2 · Блок 0 — работа над ошибками первого урока.
  *
  * Что здесь: семь примитивов и `typeof` · `strict` в tsconfig против `'use strict'`
- * в JS · Map и Set как самостоятельные объекты · hoisting и перегрузки функций.
+ * в JS · Map и Set как самостоятельные объекты · hoisting и перегрузки функций ·
+ * tuple и push.
  *
  *   node lessons/lesson-02/examples/00-errata.ts     запустить
  *   yarn typecheck                                   проверить типы
@@ -54,6 +55,16 @@ console.log('перегрузка:', asText(5), asText(new Date(0)));
 // console.log(arrowFn());
 const arrowFn = (): string => 'я обычная переменная';
 console.log('стрелочная:', arrowFn());
+
+// ── Tuple и push ───────────────────────────────────────────────────────────
+// Длина tuple проверяется при присваивании и по индексу, но push достался
+// от обычного массива и не проверяется.
+const pair: [number, string] = [1, 'a'];
+pair.push(2);
+console.log('tuple после push:', pair, 'length:', pair.length);
+
+// ❌ TS2493: Tuple type '[number, string]' of length '2' has no element at index '2'
+// console.log(pair[2]);
 
 // Файл заканчивается пустым `export {};` — без него он считался бы глобальным
 // скриптом, и его объявления столкнулись бы с соседними примерами и с вашим

@@ -78,7 +78,7 @@ cat <<'TEXT'
     html      — один прогон подробно (включён только в explorer;
                 в monolith и widgets его нет);
     allure    — история многих прогонов, для CI;
-    TestRail  — свой репортер monolith: не показывает, а проставляет
-                результаты в TestRail (включается флагом --testrail
+    TestRail  — общий репортер monolith и widgets: не показывает,
+                а проставляет результаты в TestRail (включается флагом --testrail
                 или переменной TESTRAIL_ENABLED=true).
 TEXT

@@ -57,6 +57,7 @@ console.log('8)', date?.groups?.year, date?.groups?.day);
 // \1 внутри шаблона — «здесь тот же ТЕКСТ, что совпал с первой группой».
 // Не тот же шаблон — тот же текст. \2 — со второй, и так далее.
 // projects/monolith/tests/regression-run/app-drawer-reports/staff/payroll-summary/C22831.helpers.ts:307
+// (ветка test-generation)
 const sameYear = /January 01, (\d{4}) - December 31, \1/;
 console.log('9)', sameYear.test('Payroll Summary, January 01, 2025 - December 31, 2025'),
   sameYear.test('Payroll Summary, January 01, 2025 - December 31, 2026'));
@@ -76,7 +77,7 @@ console.log('12)', buttons.filter((l) => /^Save|Cancel$/.test(l)));
 //       и 'Save draft' проходит по первой половине.
 
 // ── Регулярка из проекта — вместе с кодом вокруг ───────────────────────────
-// helpers/monolith/components/schedule.ts:194-202. Шаблон сам по себе:
+// helpers/monolith/components/schedule.ts:198-206. Шаблон сам по себе:
 const timeRe = /^(\d{1,2})(?::?(\d{2}))?(am|pm)$/;
 console.log('13)', '5:30pm'.match(timeRe)?.slice(1, 4), '5pm'.match(timeRe)?.slice(1, 4), timeRe.test('5:30'));
 

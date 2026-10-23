@@ -50,8 +50,9 @@ cat <<'TEXT'
   dataset — не Map (5d): у него нет get, читают через точку —
   dataset.uid. Это объект особого класса DOMStringMap.
 
-  В wl-e2e data-key — частый способ найти строку по id из базы:
-  schedule.ts:320-322, gift-card-page.ts:42.
+  В wl-e2e из data-key строки результата поиска читают uid клиента —
+  правило T10 в RULES.md: не разбирать uid из адреса.
+  schedule.ts:326, gift-card-page.ts:43.
 TEXT
 
 say "toHaveValue против toHaveAttribute"
@@ -135,5 +136,6 @@ cat <<'TEXT'
 
   Так устроен Chosen в WL: настоящий <select> спрятан, на экране —
   набор div. Тест выставляет значение спрятанному select через
-  page.evaluate — appointment-setup-page.ts:457-465 в wl-e2e.
+  locator.evaluate — helpers/monolith/setup/services/appointment-setup-page.ts:458-466
+  в wl-e2e.
 TEXT

@@ -30,11 +30,13 @@ TEXT
 say "Postgres: без пароля не стартует"
 run docker run --name runlog-db postgres:18-alpine
 run docker ps -a --filter name=runlog-db --format '{{.Names}}  {{.Status}}'
-run docker rm runlog-db
+run docker rm -v runlog-db
 cat <<'TEXT'
   Чужой образ ждёт настроек — какие, написано на его странице:
   hub.docker.com/_/postgres, «Environment Variables». Контейнер с ошибкой
   остался остановленным: docker ps показывает только работающие, -a — все.
+  -v у docker rm — удалить и безымянный том контейнера: образ Postgres
+  создаёт такой на каждый контейнер, под данные базы (/var/lib/postgresql).
 TEXT
 
 say "Postgres: как просит документация"
@@ -53,10 +55,13 @@ run docker exec runlog-db sh -c 'echo привет > /tmp/note.txt'
 run docker stop runlog-db
 run docker start runlog-db
 run docker exec runlog-db cat /tmp/note.txt
-run docker rm -f runlog-db
+run docker rm -f -v runlog-db
 run docker run --rm postgres:18-alpine cat /tmp/note.txt
 cat <<'TEXT'
   stop + start — тот же контейнер, файл на месте. rm — контейнера больше нет,
   и новый из того же образа файла не видит. Пропадает при удалении, а не при
   остановке; --rm удаляет сам, поэтому кажется, что «пропало при остановке».
+  Данные самой базы — особый случай: они в безымянном томе, и docker rm без -v
+  оставляет его висеть (docker volume ls -f dangling=true); новый контейнер
+  получает новый, пустой.
 TEXT

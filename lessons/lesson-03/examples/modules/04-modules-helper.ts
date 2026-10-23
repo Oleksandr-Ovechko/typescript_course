@@ -19,8 +19,9 @@ export function login(): string {
 
 // ── Экспорт по умолчанию ───────────────────────────────────────────────────
 // В файле он может быть только один. В `wl-e2e` такие экспорты есть —
-// 15 файлов на ветке draft, и все одного сорта: `playwright.config.ts`,
-// `globalSetup.ts`, `global-teardown.ts`, `testrail-reporter.ts`. То есть файл,
+// около двадцати файлов на ветке draft, и все одного сорта: варианты
+// `playwright.*.config.ts`, `globalSetup.ts`, `global-teardown.ts`,
+// `helpers/utils/testrail-reporter.ts`. То есть файл,
 // который целиком существует ради одной вещи, забираемой инструментом.
 export default {
   workers: 8,

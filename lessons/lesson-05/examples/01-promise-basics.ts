@@ -93,8 +93,9 @@ function cachedPrice(known: number | undefined): Promise<number> {
 }
 console.log('11)', await cachedPrice(5), '·', await cachedPrice(undefined));
 
-// В wl-e2e ни Promise.resolve, ни Promise.reject не встречаются ни разу.
-// И сам new Promise — десять раз на весь проект. Уметь надо ЧИТАТЬ чужие
+// В wl-e2e Promise.resolve и Promise.reject — единичные места (по два на 22.10.2026),
+// а сам new Promise — десятки раз на тысячи файлов, около половины из них —
+// пауза new Promise((resolve) => setTimeout(resolve, ms)). Уметь надо ЧИТАТЬ чужие
 // промисы, а не создавать свои.
 
 export {};

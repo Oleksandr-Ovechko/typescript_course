@@ -43,18 +43,25 @@ curl -X POST "localhost:3000/runs?case=C19633&status=passed"
 curl localhost:3000/runs
 ```
 
+В `docker logs runlog` вместо `хранилище postgres` — `ECONNREFUSED`?
+База из шага 1 ещё не успела подняться: подождите пару секунд и
+повторите `docker rm -f runlog` и `docker run … runlog` (почему — шаг 4).
+
 **Шаг 4.** Пересоздать базу — без паузы и с паузой:
 
 ```bash
-docker rm -f runlog runlog-db
+docker rm -f -v runlog runlog-db
 docker run -d --name runlog-db --network runlog-net -e POSTGRES_USER=runlog -e POSTGRES_PASSWORD=runlog postgres:18-alpine
 docker run -d --init --name runlog --network runlog-net -p 3000:3000 -e DATABASE_URL=postgres://runlog:runlog@runlog-db:5432/runlog runlog
 docker ps -a
 docker logs runlog
 ```
 
-Потом снова `docker rm -f runlog runlog-db` и те же два `docker run`,
+Потом снова `docker rm -f -v runlog runlog-db` и те же два `docker run`,
 но между ними — `sleep 5`; в конце — `curl localhost:3000/runs`.
+
+`-v` у `docker rm` удаляет и безымянный том контейнера: образ Postgres
+создаёт такой под данные базы, и без `-v` он остался бы висеть.
 
 **Шаг 5.** Данные базы — в томе:
 

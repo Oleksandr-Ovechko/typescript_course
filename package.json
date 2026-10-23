@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit",
     "typecheck:hw2": "tsc --noEmit -p lessons/lesson-02/homework",
     "typecheck:hw3": "tsc --noEmit -p lessons/lesson-03/homework",
+    "typecheck:hw4": "tsc --noEmit -p lessons/lesson-04/homework",
     "typecheck:hw5": "tsc --noEmit -p lessons/lesson-05/homework",
     "typecheck:hw6": "tsc --noEmit -p lessons/lesson-06/homework",
     "typecheck:hw10": "tsc --noEmit -p lessons/lesson-10/homework",

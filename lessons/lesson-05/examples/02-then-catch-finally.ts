@@ -72,8 +72,8 @@ console.log('7)', await fetchWith(true), '· открытых соединени
 // Без .finally закрытие пришлось бы писать дважды: в .then и в .catch. Забыли
 // в одной ветке — соединение висит ровно в том случае, когда что-то сломалось.
 //
-// В wl-e2e .finally у промиса не встречается ни разу, а вот try/…/finally —
-// 564 раза. Идея та же, запись другая.
+// На ветке draft .finally у промиса не встречается ни разу, а вот try/…/finally —
+// тысячи раз (около 3000 на 22.10.2026). Идея та же, запись другая.
 
 // ── Цепочка: .catch ловит и то, что бросил .then ───────────────────────────
 // Работает потому, что .then возвращает НОВЫЙ промис — есть на что навесить
@@ -111,10 +111,11 @@ const missing = await waitForVisible(false)
   .catch(() => false);
 console.log('11)', appeared, missing);
 
-// Модель конструкции из wl-e2e — она встречается в 347 файлах:
+// Модель конструкции из wl-e2e — она встречается в полутора тысячах файлов
+// (на 22.10.2026):
 //
 //   // projects/widgets/setup-run/009-c4793-appointment-widget-no-merchant/
-//   //   004-create-instructor.spec.ts:40
+//   //   004-create-instructor.spec.ts:41
 //   const hasAgreementToSign = await page
 //     .locator('button.js-button-sign')
 //     .waitFor({ state: 'visible', timeout: 15_000 })

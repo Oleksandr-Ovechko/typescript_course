@@ -1,9 +1,9 @@
 /**
  * Урок 3 · Блок 3 — деструктуризация и спред.
  *
- * Что здесь: деструктуризация объекта, переименование, массивы и пропуск
- * элементов · деструктуризация параметров функции — то самое `({ page })` ·
- * спред как копия и как склейка · три уровня копирования и где здесь ловушка.
+ * Что здесь: деструктуризация объекта, переименование, значение по умолчанию,
+ * массивы и пропуск элементов · деструктуризация параметров функции — то
+ * самое `({ page })` · спред как копия и как склейка · три уровня копирования и где здесь ловушка.
  *
  *   node lessons/lesson-03/examples/05-destructuring-spread.ts
  *   yarn typecheck
@@ -44,6 +44,24 @@ console.log('через один:', first, third);
 // Остаток собирается в массив теми же тремя точками, что и спред.
 const [head, ...tail] = sizes;
 console.log('голова:', head, '· хвост:', tail);
+
+// ── Значение по умолчанию ──────────────────────────────────────────────────
+// Если поля нет (в нём undefined), после `=` можно дать запасное значение.
+// Так устроены хелперы wl-e2e с необязательными настройками —
+// helpers/monolith/kiosks/attendance-kiosk-page.ts:39 (ветка draft):
+//
+//   { maxDays = 30, className, daySwitchTimeoutMs = 7000 }: WaitForClassOptions = {},
+//
+// `= {}` в конце — на случай, если объект настроек не передали вовсе.
+type WaitOptions = { maxDays?: number; className?: string };
+
+function describeWait({ maxDays = 30, className }: WaitOptions = {}): string {
+  return `дней: ${maxDays}, класс: ${className}`;
+}
+
+console.log('всё задано   :', describeWait({ maxDays: 7, className: 'Yoga' })); // дней: 7, класс: Yoga
+console.log('без maxDays  :', describeWait({ className: 'Yoga' }));             // дней: 30, класс: Yoga
+console.log('без объекта  :', describeWait());                                  // дней: 30, класс: undefined
 
 // ── Деструктуризация параметров функции ────────────────────────────────────
 // Та самая конструкция, что стоит в каждом тесте.
@@ -111,9 +129,10 @@ console.log('поменяли оригинал → в копии:', shallow.retr
 //   const a = obj;                  ссылка — не копия вообще
 //   const b = { ...obj };           поверхностная копия — верхний уровень
 //   const c = structuredClone(obj); глубокая копия — всё целиком
+config.retry.count = 3;
 const deep = structuredClone(config);
 config.retry.count = 1;
-console.log('глубокая копия не пострадала:', deep.retry.count);         // 99
+console.log('глубокая копия не пострадала:', deep.retry.count);         // 3
 
 // В `wl-e2e` на ветке draft глубокого копирования нет вовсе: ни
 // `structuredClone`, ни приёма `JSON.parse(JSON.stringify(x))` — ноль вхождений.

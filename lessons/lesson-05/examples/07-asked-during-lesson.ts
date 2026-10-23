@@ -43,13 +43,13 @@ console.log('3)', round(147), '·', round(302));
 // ── Почему хелпер «ничего не возвращает», а тип у него Promise<void> ───────
 // Вопрос задавали трижды разными словами. Настоящий хелпер из проекта:
 //
-//   // helpers/monolith/add-client/client-add-page.ts:27
+//   // helpers/monolith/add-client/client-add-page.ts:28
 //   export async function openAddClientForm(page: Page): Promise<void> {
 //     await page.locator('a.js-menu-item-user-create').click();
 //     await expect(page.locator(`${ADD_CLIENT_FORM} input[name="s_firstname"]`)).toBeVisible();
 //   }
 //
-// Внутри происходит многое: клик, ожидание элемента до 15 секунд. Но НАРУЖУ
+// Внутри происходит многое: клик, ожидание элемента. Но НАРУЖУ
 // функция не отдаёт ничего — в теле нет ни одного return. void — это не
 // «ничего не делает», это «нечего забрать».
 //

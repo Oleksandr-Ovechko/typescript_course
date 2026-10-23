@@ -38,7 +38,7 @@ for (const reporter of reporters) {
 // ── Любую ошибку читают как Error ─────────────────────────────────────────
 class OverlapRefusal extends Error {
   constructor(diagnostics: string) {
-    super(`the checkout refused this session: ${diagnostics}`);
+    super(`the checkout refused this session. It rendered: ${diagnostics}`);
     this.name = 'OverlapRefusal';
   }
 }

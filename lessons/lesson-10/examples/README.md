@@ -73,16 +73,16 @@ node -e "const {Readable}=require('node:stream');console.log(typeof Readable.fro
 
 ## Строки, которые не должны компилироваться
 
-Пять штук, все помечены `// ❌ TS####`. Раскомментируйте и запустите
+Три штуки, все помечены `// ❌ TS####`. Раскомментируйте и запустите
 `yarn typecheck` — код ошибки должен совпасть с заявленным.
 
 | Где | Код | Что не так |
 |---|---|---|
-| [`02-iterable-and-array-like.ts`](02-iterable-and-array-like.ts) | `TS2488` | То же самое — спред массивоподобного |
-| [`02-iterable-and-array-like.ts`](02-iterable-and-array-like.ts) | `TS2488` | Спред над `NodeList`: в `tsconfig` нет `DOM.Iterable`. Ловит `yarn typecheck` (TypeScript 5.9); редактор на TypeScript 6.0 — нет |
+| [`02-iterable-and-array-like.ts`](02-iterable-and-array-like.ts) | `TS2488` | Спред массивоподобного объекта |
+| [`02-iterable-and-array-like.ts`](02-iterable-and-array-like.ts) | `TS2488` | Спред над `NodeList`: в `tsconfig` курса нет `DOM.Iterable` (в `wl-e2e` он есть с сентября 2026 — там строка компилируется). Ловит `yarn typecheck` (TypeScript 5.9); редактор на TypeScript 6.0 — нет |
 | [`02-iterable-and-array-like.ts`](02-iterable-and-array-like.ts) | `TS2488` | `for...of` над `NodeList` — по той же причине |
 
-Три из пяти — один и тот же код с разными словами: «здесь нет
-`Symbol.iterator`». Его стоит запомнить в лицо. Последние два особенно:
-в браузере такой код работает, а компилятор проекта его не пропускает —
-отсюда больше двух тысяч `Array.from` в `wl-e2e`.
+Все три — один и тот же код: «здесь нет `Symbol.iterator`». Его стоит
+запомнить в лицо. Последние два особенно: в браузере такой код работает,
+а компилятор без `DOM.Iterable` его не пропускает — так было в `wl-e2e`
+до сентября, отсюда больше двух тысяч `Array.from` в старом коде.

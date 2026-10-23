@@ -10,7 +10,8 @@ projects/widgets/tests/regression-run/lead-capture-widget/C154005.spec.ts
 и ссылка на пример, где она разобрана отдельно.
 
 > Запустить его через `node` не получится: он импортирует Playwright и требует
-> браузера. Читаем глазами; запускается — `npx playwright test C154005`.
+> браузера. Читаем глазами; запускается из `projects/widgets` —
+> `yarn case C154005 --env=<окружение>` (живые окружения — `staging-exp*`, `staging-gen*`).
 
 ---
 
@@ -43,11 +44,12 @@ import {
 Граница проходит **не по собачке**, а по форме пути: начинается с точки — файл
 рядом; не начинается — ищем в `node_modules`. Локальный пакет монорепы лежит
 там же: Yarn положил в `node_modules` симлинк `wl-e2e-automation-helpers → ../helpers`,
-это видно командой `ls -la node_modules | grep wl-e2e`.
+это видно командой `ls -la node_modules | grep wl-e2e-automation`.
 
 Все импорты именованные — имена в фигурных скобках. Импорт по умолчанию
-в тестах не встречается; он есть в 15 файлах на `draft`, и все они одного
-сорта: `playwright.config.ts`, `globalSetup.ts`, `testrail-reporter.ts`.
+в тестах не встречается; он есть примерно в двадцати файлах на `draft`, и все
+они одного сорта: варианты `playwright.*.config.ts`, `globalSetup.ts`,
+`helpers/utils/testrail-reporter.ts`.
 
 Разобрано в [`modules/04-modules.ts`](modules/04-modules.ts).
 
@@ -81,8 +83,8 @@ test.describe('[C154005][Lead Capture] [SBO] Verify Form Settings…', () => {
 `test` — объект, импортированный из Playwright. У него берётся метод `describe`,
 и ему передаются **два аргумента**: строка с названием и функция.
 
-Вторая — колбэк. Мы её пишем, но не вызываем: вызовет Playwright, когда дойдёт
-до этого набора тестов. Размер тела значения не имеет — важно лишь, что мы
+Вторая — колбэк. Мы её пишем, но не вызываем: вызовет Playwright — сразу
+при загрузке файла, чтобы узнать, какие тесты внутри (подробно — урок 6). Размер тела значения не имеет — важно лишь, что мы
 передаём функцию, а не результат её вызова.
 
 Разобрано в [`03-functions-as-values.ts`](03-functions-as-values.ts).
@@ -103,7 +105,7 @@ let skinName: string;
 `const` здесь не подошёл бы: в него нельзя записать значение позже.
 
 > Три разные функции читают и пишут одну внешнюю переменную. Это уже почти
-> замыкание — тема урока 5.
+> замыкание — тема урока 6.
 
 Обратите внимание, что тип написан вручную: `let skinName: string;`. Без
 присвоения выводить компилятору не из чего.
@@ -165,8 +167,9 @@ skinName = `C154005_${testInfo.workerIndex}_${testInfo.retry}`;
 - `retry` — номер попытки, 0 для первого запуска.
 
 Про воркеры: по умолчанию Playwright берёт **половину логических ядер**
-процессора, а не один поток. В `wl-e2e` число задано явно — в обоих
-`playwright.config.ts` стоит `workers: 8` и `retries: 1`. Своими руками тесты
+процессора, а не один поток. В `wl-e2e` во всех трёх `playwright.config.ts` —
+`workers: parallelWorkers()` (по умолчанию 8, меняется переменной `WL_WORKERS`;
+`helpers/utils/regression-lane.ts`) и `retries: 1`. Своими руками тесты
 по воркерам не раскладывают: Playwright сам делит очередь примерно поровну.
 
 Уникальность можно было бы получить и через `Math.random()` — тогда `testInfo`
@@ -206,11 +209,13 @@ test('Form Settings and Styling changes are reflected…', async ({ page }) => {
 хелперов с `await`. Всё, что нужно, чтобы это читать, уже разобрано.
 
 Единственное, на что стоит посмотреть, — `'OFF'` в строке 49. Это не просто
-строка. Вот сигнатура хелпера, `helpers/monolith/webstie-widgets/lead-capture-page.ts:114`:
+строка. Вот сигнатура хелпера, `helpers/monolith/webstie-widgets/lead-capture-page.ts:140`:
 
 ```ts
 export async function setLeadCaptureFormFieldState(
-  page: Page, fieldNames: string[], state: 'ON' | 'OFF',
+  page: Page,
+  fieldNames: string[],
+  state: 'ON' | 'OFF',
 ): Promise<void> {
   const oppositeState = state === 'ON' ? 'OFF' : 'ON';
 ```
@@ -230,5 +235,6 @@ export async function setLeadCaptureFormFieldState(
 console.log(...FIELDS_TO_DISABLE);   // то же, что console.log('Cell phone', 'Gender')
 ```
 
-Разбор хелперов, на которые ссылается этот файл, — на следующем занятии:
-внутри них конструкции заковыристее, чем в самом тесте.
+Хелперы, на которые ссылается этот файл (`C154005.helpers.ts` и
+`lead-capture-page.ts`), читаются тем же набором конструкций плюс
+`async`/`await` из урока 5.

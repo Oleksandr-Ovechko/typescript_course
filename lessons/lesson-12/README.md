@@ -52,8 +52,9 @@ node lessons/lesson-12/examples/08-prototypes.ts
 **1. Ждут не только `click`, `fill`, `check`, `expect` и `textContent`.**
 Ждут почти все вызовы, которые что-то делают с одним элементом: `hover()`,
 `getAttribute()`, `innerText()`, `isEnabled()`, `waitFor()` и так далее.
-Не ждут только пять: `count()`, `all()`, `allTextContents()`, `isVisible()`,
-`isHidden()`. И `textContent()` ждёт **элемент**, а не какой-то текст:
+Не ждут только вызовы для списка — `count()`, `all()`, `allTextContents()`,
+`allInnerTexts()`, `evaluateAll()` — и `isVisible()`, `isHidden()`.
+И `textContent()` ждёт **элемент**, а не какой-то текст:
 вернёт тот текст, что в элементе есть. → [Автоожидание](#автоожидание)
 
 **2. В `waitFor` передают одно из четырёх состояний: `attached`, `detached`,
@@ -62,8 +63,8 @@ node lessons/lesson-12/examples/08-prototypes.ts
 Дождаться доступности кнопки — `expect(x).toBeEnabled()`.
 
 **3. `expect(...)` ждёт по `expect.timeout`, а не по `actionTimeout`.**
-«3 или 5 секунд, чтобы дождаться элемента» — это `expect.timeout`: в
-конфигах `monolith` и `widgets` он не задан, то есть 5 с по умолчанию.
+«3 или 5 секунд, чтобы дождаться элемента» — это `expect.timeout`: 5 с,
+умолчание Playwright (в конфиге `widgets` оно записано явно).
 `actionTimeout` (15 с) — у действий: `click`, `fill`, `waitFor`.
 → [таблица тайм-аутов](#какой-тайм-аут-за-что-отвечает)
 
@@ -107,9 +108,14 @@ CSS не умеет искать ни по тексту, ни по доступ�
 
 **Мелочи.**
 
-- `isVisible(` в `wl-e2e` — около **8 300** вызовов, из них около **3 500** — с тайм-аутом.
+- `isVisible(` в `wl-e2e` на момент занятия — около **8 300** вызовов, из них
+  около **3 500** — с тайм-аутом. К 22.10 с тайм-аутом осталось около 2 700
+  на `test-generation` и около 1 000 на `draft`.
 - `getByTestId` в проекте есть — один вызов.
-- Правило про `.first()` — **A8** в `CONVENTIONS.md`.
+- Правило про `.first()` — **A8** в `RULES.md`.
+- Не все тесты виджетов работают через iframe: часть открывает виджет прямо
+  по его адресу, без страницы-хозяина (например, `C156177`), — там
+  `frameLocator` не нужен.
 - `following-sibling::tr[…][1]` в XPath — следующая **соседняя** строка
   таблицы, а не предок или потомок.
 - В `--debug` между шагами проходят секунды, а не миллисекунды: этого
@@ -202,11 +208,12 @@ getByRole(...)` → `locator resolved to 0 elements` → `resolved to 3` →
 | Ждут | Не ждут — отвечают «про сейчас» |
 |---|---|
 | действия: `click`, `fill`, `check`, `hover`… | `count()`, `all()` |
-| проверки `expect(...)` | `allTextContents()` |
+| проверки `expect(...)` | `allTextContents()`, `allInnerTexts()`, `evaluateAll()` |
 | чтение одного элемента: `textContent()`, `getAttribute()`, `innerText()`, `isEnabled()`, `waitFor()` | `isVisible()`, `isHidden()` |
 
-Запоминать проще через исключения: **не ждут только эти пять**, всё
-остальное у локатора ждёт, пока элемент появится.
+Запоминать проще через исключения: **не ждут только эти семь** — вызовы
+для списка и `isVisible`/`isHidden`, всё остальное у локатора ждёт, пока
+элемент появится.
 
 **`waitFor`** ждёт одно из четырёх состояний: `attached` (есть в DOM),
 `detached` (исчез из DOM), `visible` (виден — по умолчанию), `hidden`
@@ -221,9 +228,12 @@ getByRole(...)` → `locator resolved to 0 elements` → `resolved to 3` →
 | Что ждёт | Ключ конфига | У нас |
 |---|---|---|
 | весь тест целиком | `timeout` | 60 с |
-| `expect(...).toBeVisible()`, `toHaveText()` и другие проверки | `expect.timeout` | 5 с — не задан, умолчание |
+| `expect(...).toBeVisible()`, `toHaveText()` и другие проверки | `expect.timeout` | 5 с — умолчание Playwright |
 | `click`, `fill`, `check`, `hover`, `textContent()`, `waitFor()` — действия с элементом | `use.actionTimeout` | 15 с |
 | `goto`, `reload`, `goBack`, `goForward`, `waitForURL` | `use.navigationTimeout` | 15 с |
+
+На медленных стендах числа больше: конфиг умножает их на `WL_TIMEOUT_SCALE`
+из `config/.env.<окружение>` — у `wl-aut-*` он равен 2.
 
 Явный `{ timeout }` в самом вызове всегда сильнее конфига. Клика в строке
 навигации нет: кликнули по клиенту — и дальше ждёт следующий шаг,
@@ -235,8 +245,10 @@ getByRole(...)` → `locator resolved to 0 elements` → `resolved to 3` →
 
 ## `isVisible()` не ждёт
 
-В `wl-e2e` `isVisible(` вызывается около 8 300 раз, и около 3 500 из них —
-с тайм-аутом: `isVisible({ timeout: 5_000 })`, «подожди до пяти секунд».
+В `wl-e2e` `isVisible(` вызывается тысячи раз, и заметная часть — с
+тайм-аутом (на 22.10: на `test-generation` около 9 400 вызовов, из них
+около 2 700 с тайм-аутом; на `draft` — около 4 200 и 1 000):
+`isVisible({ timeout: 5_000 })`, «подожди до пяти секунд».
 Но этот тайм-аут **игнорируется** — в типах Playwright он помечен
 `@deprecated This option is ignored`. Баннер, который появляется через
 секунду, `isVisible` с тайм-аутом в пять секунд не видит: отвечает `false`
@@ -248,7 +260,11 @@ getByRole(...)` → `locator resolved to 0 elements` → `resolved to 3` →
 
 Ошибка **тихая**: ничего не падает. `isVisible` возвращает правдоподобный
 `false`, и код молча идёт по ветке «элемента нет». Если тест и упадёт,
-то позже и в другом месте.
+то позже и в другом месте. Настоящий случай описан в комментарии
+в `helpers/monolith/client-profile/buy-page.ts`: проверка `isVisible()`
+сразу после `networkidle` застала страницу оплаты недорисованной,
+пропустила ветку договора, и тест упал дальше — на кнопке Cash, которой
+тоже ещё не было.
 
 | Задача | Как писать |
 |---|---|
@@ -299,7 +315,7 @@ Error: locator.click: Error: strict mode violation: getByRole('button', { name: 
 
 **Последняя строка — ловушка.** Старый `page.click(селектор)` не строгий
 и молча кликает первый найденный элемент. В `wl-e2e` таких вызовов
-немного (`page.click` — 6, `page.fill` — 10), но часть — в общих
+немного — около десятка, но часть — в общих
 хелперах (`clients-report.ts`, `general-report.ts`,
 `class-schedule-setup-page.ts`). Ошибка в общем хелпере задевает все
 тесты, которые его зовут. Включить строгость для старых методов можно
@@ -325,9 +341,13 @@ Error: locator.click: Error: strict mode violation: getByRole('button', { name: 
 | 4 | `getByTestId` | если в вёрстке есть `data-testid` |
 | 5 | `page.locator('css')` | когда ничего выше не подходит |
 
-Это правило **S3** в `wl-e2e/CONVENTIONS.md`. Клод его читает — оно в тех
-файлах, с которых он начинает работу. На деле в проекте `.locator(` —
-больше 100 000 вызовов, `getByRole(` — около 17 000.
+Правило **S3** в `wl-e2e/RULES.md` говорит то же короче: `getByRole`,
+`getByLabel` и data-атрибуты — вместо CSS; XPath и `:nth-child` не
+пропускает гейт. Места для `getByText` и `getByPlaceholder` S3 не задаёт —
+порядок в таблице подсказывает, что пробовать раньше. Клод это правило
+читает — оно в тех файлах, с которых он начинает работу. На деле в
+проекте `.locator(` встречается в несколько раз чаще, чем `getByRole(`
+(на `test-generation` 22.10 — около 144 000 против 22 000).
 
 `getByTestId` у нас почти не используется: разработчики монолита
 и виджетов не ставят `data-testid`. Вопрос о том, чтобы начали ставить,
@@ -570,8 +590,9 @@ const namedClient = { name: 'Anna', toString() { return this.name; } };
    В Docker режимы с окном не работают.
 2. Локатор — описание, ищет заново при каждом вызове. `--debug` медленнее
    обычного прогона и прячет гонку.
-3. Почти всё у локатора ждёт. Не ждут только `count()`, `all()`,
-   `allTextContents()`, `isVisible()`, `isHidden()`. `expect` ждёт по
+3. Почти всё у локатора ждёт. Не ждут только вызовы для списка (`count()`,
+   `all()`, `allTextContents()`, `allInnerTexts()`, `evaluateAll()`)
+   и `isVisible()`, `isHidden()`. `expect` ждёт по
    `expect.timeout` (5 с), действия — по `actionTimeout` (15 с).
 4. Тайм-аут у `isVisible` игнорируется (W10) — ждать через
    `expect(...).toBeVisible()`.

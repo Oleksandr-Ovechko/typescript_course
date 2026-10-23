@@ -72,7 +72,7 @@ try {
 console.log('12)', '2026-10-15'.replace(/(\d{4})-(\d{2})-(\d{2})/, '$3.$2.$1'));
 
 // «Всё, кроме цифр и точки» — так из цены делают число
-// (helpers/monolith/setup/services/service-setup-page.ts:206):
+// (helpers/monolith/setup/services/service-setup-page.ts:207):
 console.log('13)', '1,234.50 USD'.replace(/[^\d.]/g, ''));
 
 // ── Ловушка: g и test ──────────────────────────────────────────────────────
@@ -102,9 +102,12 @@ console.log('19)', withD?.indices?.[1]);
 // 16) — текст со страницы часто многострочный; вместо точки в проекте
 //       пишут [\s\S] — «любой символ вообще».
 // 17) — эмодзи в JavaScript — две «половинки»; u считает его одним символом.
-//       В проекте u — в двух местах, например эмодзи:
-//       projects/widgets/tests/regression-run/schedule-widget/C189115.helpers.ts:1494
-// v в нашем tsconfig недоступен: литерал с v — ошибка TS1501 (target ES2022).
+//       В проекте u есть, например эмодзи:
+//       projects/widgets/tests/regression-run/schedule-widget/C189115.helpers.ts:1520
 // В проекте почти все флаги — i и g.
+
+// v в нашем tsconfig недоступен (target ES2022):
+// ❌ TS1501: This regular expression flag is only available when targeting 'es2024' or later.
+// const vFlag = /[\p{L}--[a-z]]/v;
 
 export {};

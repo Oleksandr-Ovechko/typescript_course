@@ -34,9 +34,10 @@ cat <<'TEXT'
   изменённые куски НЕ СОПРИКАСАЮТСЯ: между ними осталась хотя бы одна
   нетронутая строка. Соседние строки конфликтуют.
 
-  Это те же куски (hunks), что в `git add -p` на уроке 8, и то же правило
-  контекста. Правки в разных местах одного файла git сливает сам; конфликт —
-  это когда двое изменили ОДНО И ТО ЖЕ место и решить за вас нельзя.
+  Три строки контекста, которые показывают `git diff` и `git add -p`
+  (урок 8), здесь НЕ считаются: строки 5 и 7 стоят ближе трёх строк, а слились
+  молча. Конфликт — это когда двое изменили ОДНО И ТО ЖЕ место (или строки
+  вплотную), и решить за вас нельзя.
 TEXT
 cd ..
 
@@ -101,22 +102,22 @@ git log --oneline --graph --all --decorate | head -6
 cat <<'TEXT'
 
   `git add` на конфликтном файле означает «я разрешил» — в VS Code это плюс
-  у файла или кнопка Complete Merge. У коммита слияния два parent, и это
-  единственный вид коммита с двумя родителями: именно поэтому граф в этом
+  у файла или кнопка Complete Merge. У коммита слияния два parent — только
+  у коммита слияния родителей больше одного: именно поэтому граф в этом
   месте сходится обратно.
 
   В VS Code над блоком с маркерами появляется строка кнопок:
-    Accept Current   оставить свой вариант   (верхний блок, HEAD)
-    Accept Incoming  оставить чужой          (нижний блок)
-    Accept Both      оставить оба подряд
-    Compare Current Conflict / Next Conflict — сравнить и перейти к следующему
+    Accept Current Change   оставить верхний блок (HEAD)
+    Accept Incoming Change  оставить нижний блок
+    Accept Both Changes     оставить оба подряд
+    Compare Changes         открыть два варианта рядом
+  Next Conflict и Accept All Current — команды палитры (Ctrl+Shift+P).
 
-  Кнопка Resolve in Merge Editor открывает трёхпанельный редактор:
-    СЛЕВА  — Current, ваш вариант (HEAD)
-    СПРАВА — Incoming, чужой
-    СНИЗУ  — Result, то, что получится; кнопка Complete Merge внизу
-  Имена панелей те же, что у маркеров и кнопок, — по ним и ориентируйтесь,
-  если засомневались, где чей вариант.
+  Кнопка Resolve in Merge Editor открывает трёхпанельный редактор: две
+  панели с подписями Current и Incoming и снизу Result с кнопкой Complete
+  Merge. Ориентируйтесь по ПОДПИСИ панели, а не по тому, слева она или справа:
+  подписи те же, что у маркеров и кнопок. Current — всегда HEAD. Чей это
+  вариант, зависит от команды — см. последний блок.
 
   ⚠️ Accept Both — не универсальный ответ. Для списка сьютов она правильная,
   а для изменённой строки кода даст две несовместимые строки, и файл
@@ -124,4 +125,26 @@ cat <<'TEXT'
 
   ⚠️ Если вместо кнопок открылся терминальный редактор — значит не настроен
   core.editor (урок 8). Файл с маркерами тот же самый, разрешается так же.
+TEXT
+
+say "При rebase «ваше» и «чужое» меняются местами"
+cd .. && mkdir -p rebase && cd rebase
+git init -q -b main
+git config user.name t && git config user.email t@e.com
+printf 'widgets\nmonolith\n' > suites.txt && git add . && git commit -q -m "два сьюта"
+git switch -q -c feature && echo "appointments" >> suites.txt && git commit -q -am "наш коммит"
+git switch -q main && echo "schedule" >> suites.txt && git commit -q -am "чужой коммит"
+git switch -q feature
+git rebase main >/dev/null 2>&1 || true
+echo '-- маркеры при git rebase main (мы на feature):'
+cat suites.txt
+git rebase --abort
+cat <<'TEXT'
+  При merge в блоке HEAD было наше (appointments). При rebase в блоке HEAD —
+  чужое (schedule), а наш коммит — внизу, после =======.
+
+  Так происходит потому, что rebase сначала встаёт на чужую ветку (main),
+  а потом по одному накладывает на неё ваши коммиты. В момент конфликта HEAD —
+  это main. Поэтому при rebase Current (и `git checkout --ours`) — чужая
+  ветка, Incoming (`--theirs`) — ваш коммит.
 TEXT

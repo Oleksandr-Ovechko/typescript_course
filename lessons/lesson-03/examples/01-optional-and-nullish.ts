@@ -42,11 +42,11 @@ console.log('пустая строка: || →', JSON.stringify(blank || 'по �
 // когда пустая строка действительно должна считаться отсутствием.
 
 // ── Как это выглядит в реальном коде ───────────────────────────────────────
-// helpers/monolith/client-web/book-now-page.ts:59 — внутри page.evaluate():
+// helpers/monolith/client-web/book-now-page.ts:94 (ветка draft) — внутри page.evaluate():
 //
 //   const catName = category.querySelector('.js-service-category')?.textContent?.trim() ?? '';
 //
-// Читается справа налево по цепочке отказов: элемента может не быть → `?.`;
+// Читается слева направо, как цепочка отказов: элемента может не быть → `?.`;
 // текста у элемента может не быть → второй `?.`; если после всего вышло
 // null или undefined → пустая строка.
 type FakeElement = { textContent: string | null } | null;
@@ -59,9 +59,16 @@ console.log('есть текст :', JSON.stringify(readText({ textContent: '  Y
 console.log('нет текста :', JSON.stringify(readText({ textContent: null })));
 console.log('нет элемента:', JSON.stringify(readText(null)));
 
+// А осознанный `||` — helpers/monolith/store/store-page.ts:100 (ветка draft):
+//
+//   const text = await locator.evaluate((el) => el.getAttribute('data-amount') || el.textContent || '');
+//
+// Пустой атрибут data-amount считается «атрибута нет», и берётся текст.
+
 // ── Логическое присваивание ────────────────────────────────────────────────
-// «Если слева пусто — запиши справа». В `wl-e2e` на ветке draft не встречается
-// ни разу: `??=`, `||=` и `&&=` дают ноль вхождений. Знать, чтобы узнать.
+// «Если слева пусто — запиши справа». В `wl-e2e` встречается редко, в основном
+// в хелперах кейсов: `uid ??= await …` — «если ещё не нашли, найди». Знать,
+// чтобы узнать.
 let timeout: number | undefined;
 timeout ??= 1500;
 console.log('timeout после ??=:', timeout);

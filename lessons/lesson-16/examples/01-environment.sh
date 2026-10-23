@@ -71,7 +71,8 @@ EOF
 run $PW test tests/bridge.spec.ts 2>&1 | grep -E 'typeof|вернул|vibrate|код возврата|passed|failed'
 
 cat <<'TEXT'
-  Код теста выполняет Node. Там нет ни document, ни window, ни navigator.
+  Код теста выполняет Node. Там нет ни document, ни window. navigator
+  в Node есть, но свой: строка вида Node.js/24, без vibrate и прочего браузерного.
   page.evaluate(функция) отправляет функцию в страницу, выполняет её там
   и возвращает результат обратно в тест. Это единственная дверь между
   тестом и браузерными объектами.
@@ -107,6 +108,7 @@ cat <<'TEXT'
   Playwright их подменяет: строка браузера с «Mobile», ширина экрана
   393, плотность 2.75, касания.
 
-  В wl-e2e так устроен проект explorer: в его playwright.config.ts —
-  devices['Pixel 5']. Монолит идёт в настольных Chrome, Firefox и Safari.
+  В wl-e2e devices['Pixel 5'] — один из пяти проектов в playwright.config.ts
+  explorer (android); есть ещё ios — iPhone 13 Pro Max. Монолит идёт
+  в настольных Chrome, Firefox и Safari.
 TEXT

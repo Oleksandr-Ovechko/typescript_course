@@ -29,7 +29,8 @@ git grep -n "export async function clickSaveButton" origin/draft -- '*.ts'
 
 ### 4. Найдите настоящий `?.` с `??`
 
-Откройте `helpers/monolith/client-web/book-now-page.ts`, строка 59:
+Откройте `helpers/monolith/client-web/book-now-page.ts` и найдите строку
+с `js-service-category`:
 
 ```ts
 const catName = category.querySelector('.js-service-category')?.textContent?.trim() ?? '';

@@ -34,15 +34,15 @@
 
 Примеры запускаются одной командой и печатают то, что было в консоли
 на уроке: `bash lessons/lesson-16/examples/06-events.sh`. Нужен только
-установленный `wl-e2e`.
+установленный `wl-e2e`. Проверено на Linux.
 
 ---
 
 ## Уточнения к занятию
 
 Места, где на занятии прозвучала неточность. Всё проверено запуском
-в Chromium, Firefox и WebKit и поиском по `wl-e2e`. Первыми — те, что
-касаются правил и кода проекта.
+(примеры — в Chromium; поведение событий сверено и в Firefox, WebKit)
+и поиском по `wl-e2e`. Первыми — те, что касаются правил и кода проекта.
 
 **1. Правило A2 — про спеки, не про хелперы.** A2 в `RULES.md` — «A spec
 holds no DOM»: в файле `*.spec.ts` нет `page.locator` и нет своих
@@ -51,6 +51,8 @@ holds no DOM»: в файле `*.spec.ts` нет `page.locator` и нет сво
 правило не нарушает — в его комментарии так и написано: «A2 forbids DOM
 work in *specs*; this is a component helper». И баннер он сначала
 пытается закрыть кнопкой; из DOM убирает, только если кнопки нет.
+Вторым шагом убирает затемнение `.ui-widget-overlay`, если на странице
+не осталось диалога, — других баннеров он не ищет.
 
 **2. `MutationObserver` в проекте используется.** Тот же
 `migration-banner.ts`: `suppressMigrationBanner` ставит наблюдатель на
@@ -68,9 +70,10 @@ work in *specs*; this is a component helper». И баннер он сначал
 `interactive` DOM построен целиком, его уже можно читать и менять.
 
 **5. `networkidle` — 500 мс без сетевых соединений.** 5 секунд — это
-тайм-аут ожидания в хелпере `waitUntilNavigationIsFinished`: он ждёт
-`load`, потом `networkidle` не дольше 5 с, и если не дождался — это
-не ошибка (правило W12).
+тайм-аут «успокоения» в хелпере `waitUntilNavigationIsFinished`: после
+`load` он ждёт `waitForWlInactive` (спрашивает саму страницу WL, занята
+ли она) не дольше 5 с, и если не дождался — это не ошибка. Правило W12:
+ждать активность WL, а не `networkidle`.
 
 **6. `display: none` не убирает элемент из DOM.** Его не рисуют, но он
 в дереве. Playwright его читает — `textContent()` и `toHaveText`
@@ -150,6 +153,23 @@ Ctrl+N).
 **23. `input` приходит на каждое изменение поля**, а не «когда ввод
 закончился». «Значение зафиксировано» — это `change`.
 
+**24. `toHaveText('…')` со строкой читает `textContent`, а не `innerText`.**
+Он сжимает пробелы и обрезает края, но скрытый текст остаётся: у `#note`
+из примера `toHaveText('Book now')` падает — в `textContent` есть
+спрятанное «secret». Читать нарисованный текст — `{ useInnerText: true }`.
+
+**25. В спеке `actions` все действия — методы локатора Playwright**,
+включая `fill` и `dispatchEvent('click')`. У элемента DOM тоже есть
+`dispatchEvent`, но он принимает объект события
+(`new MouseEvent('click')`), а не строку.
+
+**26. Атрибут и свойство совпадают не только у `data-*`.** У большинства
+атрибутов свойство синхронизировано: `id` ↔ `id`, `class` ↔ `className`.
+Расходятся те, что хранят начальное значение: `value`, `checked`.
+
+**27. `$0` в консоли — последний выбранный во вкладке Elements элемент,
+`$1` — выбранный перед ним**: по времени выбора, а не по месту в дереве.
+
 ---
 
 ## Браузерное окружение
@@ -179,7 +199,8 @@ const title = await page.evaluate(() => document.title);
 
 **Телефон — это подмена тех же свойств.** `devices['Pixel 5']` задаёт
 строку браузера с «Mobile», экран 393 точки, плотность 2.75, касания.
-В `wl-e2e` так запускается проект explorer.
+В `wl-e2e` это один из пяти проектов explorer (`android`); есть ещё
+`ios` — `iPhone 13 Pro Max`.
 
 Пример — [`01-environment.sh`](examples/01-environment.sh).
 
@@ -253,8 +274,9 @@ shadow DOM.
 (`defaultChecked`), свойство `checked` — текущее.
 
 **`data-*`** — свои атрибуты разметки: `data-uid="501"` читается как
-`el.dataset.uid` (всегда строка). В `wl-e2e` по `data-key` находят
-строку по id из базы — `schedule.ts:320-322`.
+`el.dataset.uid` (всегда строка). В `wl-e2e` из `data-key` строки
+результата поиска читают uid клиента — правило T10 (`RULES.md`): не
+разбирать uid из адреса. Пример — `schedule.ts:326`.
 
 **Для тестов:** `toHaveValue` читает свойство — то, что сейчас в поле.
 `toHaveAttribute('value', …)` — атрибут, то, что было в разметке.
@@ -300,6 +322,14 @@ Chosen в WL: настоящий `<select>` спрятан (`display: none`), н
 | `dispatchEvent('click')` | мышь не двигается, событие отправляется прямо кнопке — **срабатывает** |
 
 `force: true` не меняет физику: верхний элемент получает клик всё равно.
+
+**В проекте — правило A11** (`RULES.md`): «A click that doesn't land: fix
+the cause before bypassing actionability». Сначала устранить причину:
+оверлей загрузки — переждать («never force through it»), действие на
+самом оверлее — нажать его. `dispatchEvent('click')` — только «followed
+by an assertion on the effect»: он пропускает проверку «кто сверху»,
+и сработал ли клик, покажет только проверка после него. `force: true` —
+только для настоящего `input`, спрятанного под стилизованный контрол.
 
 Пример — [`05-geometry-and-cover.sh`](examples/05-geometry-and-cover.sh).
 
@@ -381,8 +411,10 @@ row.dispatchEvent(new CustomEvent('booking:done', { detail: { key: '1005' }, bub
 
 **Свои события проекта.** В `wl-e2e` после выставления значения
 спрятанному `select` отправляют событие библиотеки Chosen —
-`chosen:updated` (`appointment-setup-page.ts:457-465`): библиотека его
-слушает и перерисовывает видимый список.
+`chosen:updated`: в `helpers/monolith/setup/services/class-period-edit-page.ts:35` —
+`dispatchEvent(new Event('chosen:updated'))`, в `appointment-setup-page.ts:466`
+того же каталога — через jQuery, `$(el).trigger('chosen:updated')`.
+Библиотека его слушает и перерисовывает видимый список.
 
 Пример — [`07-custom-events.sh`](examples/07-custom-events.sh).
 
@@ -416,8 +448,11 @@ row.dispatchEvent(new CustomEvent('booking:done', { detail: { key: '1005' }, bub
 intl-tel-input форматирует номер по ходу ввода, и хелпер
 `fillClientCellPhone` (`helpers/monolith/add-client/client-add-page.ts`)
 печатает по 150 мс на клавишу — при 50 мс плагин теряет последние
-цифры. А печатать начинает, только когда плагин инициализировался: до
-этого введённое стирается. На простом поле `fill` быстрее и надёжнее.
+цифры. Комментарий там же: после `fill` номер виден на экране, а клиент
+создаётся без телефона — плагин берёт значение для формы из событий
+клавиш. На ветке `test-generation` хелпер ещё и ждёт инициализации
+плагина: до неё введённое теряется. На простом поле `fill` быстрее
+и надёжнее.
 
 Пример — [`08-event-interfaces.sh`](examples/08-event-interfaces.sh).
 
@@ -458,7 +493,8 @@ WL form; use the native prototype setter»
 **Chosen.** Присвоение `select.value = …` событий не порождает: значение
 поменялось, слушатели не узнали. Поэтому проект после присвоения сам
 отправляет `change` и `chosen:updated`
-(`appointment-setup-page.ts:457-465`, `class-period-edit-page.ts:33-39`).
+(`helpers/monolith/setup/services/appointment-setup-page.ts:458-466`,
+`class-period-edit-page.ts:33-39`).
 
 Пример — [`09-forms.sh`](examples/09-forms.sh).
 
@@ -494,10 +530,15 @@ complete     ─ картинки, стили, фреймы скачаны
 вешается на `load`: после `commit` и `domcontentloaded` — «не записан»,
 после `load` — «записан».
 
+Бывает и тише: строки отчёта приходят запросом после загрузки, и
+`count()` сразу после `domcontentloaded` — 0 вместо 50, без ошибки
+(`.claude/knowledge/page-facts/bo/bo-app-drawer-view-all-edit-log.md`
+в `wl-e2e`). Лечение — ждать первую строку, а не событие загрузки.
+
 **Хелперы проекта.** Переходы между страницами ждут через
 `waitUntilNavigationIsFinished` (`helpers/monolith/technical-helper.ts`):
 сначала `load` — обязательно, потом короткое «успокоение» не дольше 5 с,
-и истечение — не ошибка. В ветке `draft` это «успокоение» —
+и истечение — не ошибка. Это «успокоение» —
 `waitForWlInactive` (`helpers/monolith/utils/wl-activity.ts`): он
 спрашивает саму страницу WL, занята ли она — запросы AJAX, переход,
 переключение вида, анимации jQuery, — как это делает собственный

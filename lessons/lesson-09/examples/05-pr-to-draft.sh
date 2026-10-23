@@ -18,7 +18,8 @@ say() { printf '\n\033[1m── %s\033[0m\n' "$1"; }
 
 say "Расстановка сил в wl-e2e"
 cat <<'TEXT'
-    autonomous-test-gen-experiment   рабочая. Здесь чинятся и копятся тесты
+    test-generation                  рабочая (до 17.10 — autonomous-test-gen-experiment).
+                                     Здесь чинятся и копятся тесты
     draft                            только цель для PR. Работать на ней нельзя
     AUT-{тикет}-C{кейс}-{описание}   ветка под один PR, режется ОТ origin/draft
 
@@ -46,17 +47,17 @@ mkdir -p tests && echo "общая база" > tests/base.ts
 git add . && git commit -q -m "начало"
 BASE=$(git rev-parse HEAD)
 for i in $(seq 1 30); do echo "draft-правка $i" >> tests/base.ts; git commit -qam "draft: коммит $i"; done
-git switch -q -c autonomous-test-gen-experiment "$BASE"
+git switch -q -c test-generation "$BASE"
 for i in $(seq 1 20); do echo "exp-правка $i" >> tests/base.ts; git commit -qam "exp: коммит $i"; done
 echo "починенный тест" > tests/C20992.spec.ts
 echo "правка хелпера" >> tests/base.ts
 git add . && git commit -q -m "AUT-1566: фикс поиска в Store"
 echo '-- насколько разошлись (слева draft, справа рабочая):'
-git rev-list --left-right --count draft...autonomous-test-gen-experiment
+git rev-list --left-right --count draft...test-generation
 
 say "Очевидный путь: перенести коммит через cherry-pick"
 git switch -q draft
-git cherry-pick autonomous-test-gen-experiment 2>&1 | grep -E 'CONFLICT|could not apply' || true
+git cherry-pick test-generation 2>&1 | grep -E 'CONFLICT|could not apply' || true
 git status --short | head -3
 git cherry-pick --abort
 cat <<'TEXT'
@@ -74,7 +75,7 @@ TEXT
 say "Как надо: worktree от draft + git show"
 git worktree add -q -b AUT-1566-C20992-store-search ../pr-wt draft
 cd ../pr-wt
-git -C ../big show autonomous-test-gen-experiment:tests/C20992.spec.ts > tests/C20992.spec.ts
+git -C ../big show test-generation:tests/C20992.spec.ts > tests/C20992.spec.ts
 git status --short
 git add tests/C20992.spec.ts
 git commit -q -m "AUT-1566: фикс поиска в Store (C20992)"
@@ -115,23 +116,22 @@ cat <<'TEXT'
     git worktree add -b AUT-1566-C20992-store-search \
       /home/alex/work/wl-e2e-worktrees/AUT-1566-C20992 origin/draft
     cd /home/alex/work/wl-e2e-worktrees/AUT-1566-C20992
+    T=projects/monolith/tests/regression-run/client-profile/account/passes-and-memberships
 
     git -C /home/alex/work/wl-e2e show \
-      autonomous-test-gen-experiment:projects/monolith/tests/C20992.spec.ts \
-      > projects/monolith/tests/C20992.spec.ts
+      test-generation:$T/C20992.spec.ts \
+      > $T/C20992.spec.ts
     git -C /home/alex/work/wl-e2e show \
-      autonomous-test-gen-experiment:projects/monolith/tests/C20992.helpers.ts \
-      > projects/monolith/tests/C20992.helpers.ts
+      test-generation:$T/C20992.helpers.ts \
+      > $T/C20992.helpers.ts
 
     yarn install
     cp /home/alex/work/wl-e2e/projects/monolith/config/.env.staging-exp3.secure \
        projects/monolith/config/.env.staging-exp3.secure
 
-    yarn eslint projects/monolith/tests/C20992.spec.ts \
-                projects/monolith/tests/C20992.helpers.ts
+    yarn eslint $T/C20992.spec.ts $T/C20992.helpers.ts
 
-    git add projects/monolith/tests/C20992.spec.ts \
-            projects/monolith/tests/C20992.helpers.ts
+    git add $T/C20992.spec.ts $T/C20992.helpers.ts
     git commit -m "AUT-1566: fix Store search for C20992"
     git push -u origin AUT-1566-C20992-store-search
     gh pr create --base draft --title "AUT-1566 C20992 ..." --body "..."
@@ -143,7 +143,7 @@ cat <<'TEXT'
   • yarn install обязателен. Ветка от draft — другой yarn.lock, и node_modules
     в новой папке своя.
   • yarn eslint ДО коммита, а не после. Импорты на draft и на рабочей ветке
-    разошлись: файл, который линтился на experiment, на draft может не пройти.
+    разошлись: файл, который линтился на test-generation, на draft может не пройти.
     Это ловят здесь, а не в PR.
   • .env.*.secure копируется, а не переносится через git: эти файлы
     в .gitignore, в репозиторий креды не попадают никогда.

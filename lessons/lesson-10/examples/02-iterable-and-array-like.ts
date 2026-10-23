@@ -73,15 +73,23 @@ console.log('5) деструктуризация строки:', firstLetter, '+
 // DOM-коллекциями внутри page.evaluate: Array.from(select.options),
 // Array.from(document.querySelectorAll(...)).
 //
-// В браузере [...document.querySelectorAll('a')] работает. Но компилятор
-// об этом не знает. В tsconfig проекта (и этого курса — он копия):
+// В браузере [...document.querySelectorAll('a')] работает. Знает ли об этом
+// компилятор, решает "lib" в tsconfig. В этом курсе:
 //
 //   "lib": ["ES2022", "DOM"]
 //
-// Нет "DOM.Iterable" — а в TypeScript 5.9, который стоит в проекте, именно
-// там объявлено, что NodeList и HTMLOptionsCollection итерируемы. Для него
-// они только массивоподобные. Значит, спред и for...of — ошибка типов,
-// а Array.from, которому хватает ArrayLike, проходит.
+// Нет "DOM.Iterable" — а в TypeScript 5.9 именно там объявлено, что NodeList
+// и HTMLOptionsCollection итерируемы. Для него они только массивоподобные.
+// Значит, спред и for...of — ошибка типов, а Array.from, которому хватает
+// ArrayLike, проходит.
+//
+// Так же было в wl-e2e до сентября 2026 (в draft DOM.Iterable добавлен
+// 09.09, в рабочую ветку — 27.09). Сейчас там
+//
+//   "lib": ["ES2022", "DOM", "DOM.Iterable"]
+//
+// и обе строки с ❌ ниже в проекте компилируются. В курсе DOM.Iterable
+// не добавлен намеренно — чтобы ошибку было видно.
 //
 // ⚠️ В VS Code две строки с ❌ ниже, раскомментированные, НЕ подчеркнутся.
 // Редактор проверяет встроенным TypeScript 6.0, а в 6.0 "DOM.Iterable" влили
@@ -96,7 +104,7 @@ function inBrowserOnly(): void {
   const inputs = document.querySelectorAll<HTMLInputElement>('input.js-cell-phone');
   const select = document.querySelector('select');
 
-  // Так в проекте и пишут — компилируется:
+  // Так написано большинство мест в проекте — компилируется при любом lib:
   const values = Array.from(inputs).map((el) => el.value);
   const labels = select ? Array.from(select.options).map((o) => o.text) : [];
   void values;
@@ -111,16 +119,9 @@ function inBrowserOnly(): void {
 void inBrowserOnly;
 
 // То есть Array.from в проекте — не привычка и не «старый способ»: это
-// запись, которая проходит проверку под любой версией TypeScript. Спред над
-// DOM-коллекцией проходит в редакторе и падает в yarn typecheck.
-//
-// ⚠️ На рабочей ветке autonomous-test-gen-experiment такой спред всё же
-// встречается — 111 раз, все в projects/monolith; похоже, их писали, глядя
-// на редактор, где ошибки нет. Для yarn typecheck каждый — ошибка TS2488. Их не видно, потому что tsc при синтаксической ошибке
-// не доходит до проверки типов вовсе: сообщает только синтаксис и молчит
-// про всё остальное. А синтаксическая ошибка там есть — в одном
-// из *.helpers.ts внутри JSDoc стоит `*/` посреди текста, и комментарий
-// закрывается раньше времени. Вывод на будущее: «tsc показал пятнадцать
-// ошибок» не значит «ошибок пятнадцать».
+// запись, которая проходила проверку, когда спред не проходил. Заменять её
+// не нужно, она работает и сейчас. А спред над DOM-коллекцией компилируется
+// или нет в зависимости от "DOM.Iterable" в lib — и в курсе (не в wl-e2e)
+// проходит в редакторе, но падает в yarn typecheck.
 
 export {};

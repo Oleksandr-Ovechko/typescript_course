@@ -4,7 +4,8 @@
  * Что здесь: промис и синхронный исполнитель · `await` над готовым промисом ·
  * порядок в цепочке · очереди во времени · `await` останавливает функцию,
  * а не программу · `forEach` и async · `.catch` на успехе · поля `Error` ·
- * метод промиса против функции `Promise`.
+ * метод промиса против функции `Promise` · `setTimeout` внутри промиса ·
+ * что принимает `reject` · `.catch` «на всякий случай» · `pause` после `await`.
  *
  *   node lessons/lesson-05/examples/00-corrections.ts     запустить
  *   yarn typecheck                                        проверить типы
@@ -112,8 +113,8 @@ await pause(40);
 console.log('18)', trace);
 
 // И вывод «не пользуйтесь forEach, берите for...of» слишком широк.
-// В wl-e2e 84 вызова .forEach( — и все в порядке, потому что .forEach(async
-// там ноль. Правило не про forEach, а про forEach вместе с async.
+// В wl-e2e сотни вызовов .forEach( (370 на 22.10.2026) — и все в порядке,
+// потому что .forEach(async там ноль. Правило не про forEach, а про forEach вместе с async.
 
 // ── .catch на успешном промисе не вызывается вовсе ─────────────────────────
 // Прозвучало «error там будет undefined» — как будто колбэк запускается
@@ -145,5 +146,48 @@ console.log('26) у самого промиса .all :', typeof (Promise.resolve
 
 // ❌ TS2339: Property 'all' does not exist on type 'Promise<void>'.
 // Promise.resolve().all([]);
+
+// ── setTimeout внутри new Promise микрозадачей не становится ───────────────
+// Прозвучало: «setTimeout обёрнут в промис, поэтому он тоже часть микрозадач».
+// Нет: обёртка не меняет очередь. Таймер внутри исполнителя — всё та же
+// макрозадача, и обычная микрозадача её обгоняет.
+await new Promise<void>((done) => {
+  void new Promise<void>((resolve) =>
+    setTimeout(() => {
+      console.log('28) setTimeout внутри new Promise — всё равно макрозадача');
+      resolve();
+    }),
+  );
+  void Promise.resolve().then(() => console.log('27) микрозадача — обогнала'));
+  setTimeout(done, 10);
+});
+
+// ── reject принимает любое значение, не только Error ───────────────────────
+// Прозвучало «в reject нельзя передать простое значение, нужно передавать
+// ошибку». Можно что угодно. Error передают по соглашению: у него есть message
+// и stack — отсюда (error as Error).message по всему проекту.
+console.log(
+  '29)',
+  await Promise.reject('просто строка').catch((reason: unknown) => `catch получил ${typeof reason}: ${String(reason)}`),
+);
+
+// ── .catch «к любому промису на всякий случай» — нет ──────────────────────
+// Прозвучало «хорошая практика — добавлять .catch к любым промисам». Если промис
+// ждут через await, отказ и так дойдёт до того, кто ждёт. А заглушка
+// превращает его в тихий undefined — см. 04-async-await.ts.
+try {
+  await Promise.reject(new Error('отказ дошёл сам'));
+} catch (error) {
+  console.log('30) await донёс отказ до try/catch:', (error as Error).message);
+}
+console.log('31) а с заглушкой:', await Promise.reject(new Error('отказ')).catch(() => undefined), '← ошибки как не было');
+// .catch нужен там, где отказ НЕКОМУ поймать: без await и без try вокруг.
+
+// ── После await переменная pause остаётся функцией ─────────────────────────
+// Прозвучало «дождались — объект промиса пропал, и в переменную pause
+// положился результат». В переменную ничего не кладётся: undefined — это
+// значение выражения await pause(10), а pause как была функцией, так и осталась.
+const waited = await pause(10);
+console.log('32)', typeof pause, '·', typeof waited, '← await ничего не меняет в переменной pause');
 
 export {};

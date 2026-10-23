@@ -53,22 +53,39 @@ git var GIT_EDITOR                # должно быть code --wait
 
 ## Уточнения к занятию
 
-Шесть мест, где на занятии прозвучала неточность. Всё проверено запуском,
+Семь мест, где на занятии прозвучала неточность. Всё проверено запуском,
 документацией git и `gh api`.
 
-### 1. В Merge Editor слева ваш вариант, а не чужой
+### 1. В Merge Editor смотреть на подпись панели, а не на сторону
 
-Панели называются так же, как маркеры в файле и кнопки над ними:
+Панели Merge Editor подписаны так же, как маркеры в файле и кнопки над ними, —
+Current и Incoming. Ориентироваться нужно по подписи, а не по тому, слева
+панель или справа:
 
-| Где | Ваш вариант | Чужой |
+| Где | Current | Incoming |
 |---|---|---|
 | в файле | верхний блок, `<<<<<<< HEAD` | нижний, до `>>>>>>> <sha>` |
-| кнопки над блоком | `Accept Current` | `Accept Incoming` |
-| Merge Editor | **левая** панель, Current | **правая**, Incoming |
+| кнопки над блоком | `Accept Current Change` | `Accept Incoming Change` |
+| Merge Editor | панель с подписью **Current** | панель с подписью **Incoming** |
 
 Снизу в Merge Editor — Result, то, что получится, и кнопка `Complete Merge`.
-Если засомневались, где чей вариант, ориентир один и тот же во всех трёх
-местах: **Current — это `HEAD`, то есть вы**.
+
+**Current — это всегда `HEAD`. А чей это вариант, зависит от команды.**
+При `merge` и `pull` `HEAD` — ваша ветка, Current — ваше. При `rebase`
+наоборот: git сначала встаёт на чужую ветку и по одному накладывает на неё
+ваши коммиты, поэтому в момент конфликта `HEAD` — чужая ветка. Последний блок
+[`03-conflict.sh`](examples/03-conflict.sh), `git rebase main` с ветки `feature`:
+
+```
+<<<<<<< HEAD
+schedule                      ← чужой коммит из main
+=======
+appointments                  ← ваш коммит
+>>>>>>> 5fd1300 (наш коммит)
+```
+
+То же с `git checkout --ours` / `--theirs`: при `rebase` `--ours` — ветка,
+на которую перебазируете.
 
 Ошибиться здесь дорого: в отличие от синтаксической ошибки, «принял не тот
 вариант» компилируется и проходит ревью.
@@ -90,7 +107,9 @@ git var GIT_EDITOR                # должно быть code --wait
 Запрет живёт в `.claude/commands/bugfix-batch.md`, правило 8. То есть
 **git вас не остановит** — остановиться нужно самому. Если очень нужно
 на своей ветке, то `--force-with-lease`: он хотя бы откажется, если
-на сервере появилось что-то, чего вы не видели.
+на сервере есть то, чего нет в вашем `origin/ветка`. Но любой `fetch` — ваш,
+редактора или Claude — обновляет `origin/ветка`, и после него
+`--force-with-lease` затрёт чужой коммит так же, как `--force`.
 
 ### 4. `merge` не переносит чужие коммиты «сверху»
 
@@ -120,6 +139,12 @@ gitdir: /home/alex/work/wl-e2e/.git/worktrees/AUT-1566
 на практике, копируется **только то, что лежит в репозитории**: всё из
 `.gitignore` в новую папку не попадает — ни `node_modules`, ни `.env.*.secure`.
 
+### 7. Без `-m` открывается не обязательно vim
+
+Прозвучало «откроется vim, сохранить — `Ctrl+O`, выйти — `Ctrl+X`». Это
+клавиши **nano**; в vim — `Esc`, потом `:wq`. Какой редактор откроется,
+показывает `git var GIT_EDITOR`. Подробно — [урок 8, уточнение 2](../lesson-08/README.md#2-без--m-открывается-nano-а-не-vim-и-выходят-из-них-по-разному).
+
 ---
 
 ## Свой «сервер» за одну команду
@@ -147,8 +172,9 @@ git branch -vv
 `server`. В `git remote -v` адрес печатается дважды, потому что `fetch`
 и `push` можно развести на разные адреса.
 
-`git branch -vv` показывает привязку в квадратных скобках — два `v` нужны
-именно ради неё, с одним git привязку не покажет.
+`git branch -vv` показывает привязку в квадратных скобках —
+`[origin/main: ahead 1]`. С одним `v` будет только `[ahead 1]`: насколько
+ушли, видно, а относительно какой ветки — нет.
 
 ### Что на самом деле делает `-u`
 
@@ -172,6 +198,11 @@ cat .git/refs/remotes/origin/main   # наша ЗАПИСЬ о сервере
 ```
 
 Оба — файлы **у вас на диске**.
+
+В склонированном репозитории (и в `wl-e2e`) второй `cat` может ответить
+`No such file or directory`: git упаковывает ссылки в один файл
+`.git/packed-refs`. Запись никуда не делась, посмотреть обе надёжно так:
+`git rev-parse main origin/main`.
 
 > `origin/main` не находится на сервере и не спрашивает сервер. Это ваша запись
 > о том, где ветка сервера была **в момент последнего `fetch`**. Она устаревает
@@ -249,7 +280,7 @@ git log --oneline --graph --all --decorate
 
 ```bash
 git push --force              # чужие коммиты просто исчезают
-git push --force-with-lease   # мягче: откажется, если на сервере есть новое
+git push --force-with-lease   # мягче: откажется, если на сервере есть то, чего нет в origin/ветка
 ```
 
 Про запрет — [уточнение 3](#3-push---force-запрещён-правилом-а-не-техникой).
@@ -276,9 +307,11 @@ git push --force-with-lease   # мягче: откажется, если на с
 | 8 | слилось молча |
 
 Правило точнее: **git сливает молча, если изменённые куски не соприкасаются** —
-между ними осталась хотя бы одна нетронутая строка. Это те же куски (hunks)
-и тот же контекст в три строки, что в `git add -p`
-([урок 8](../lesson-08/README.md#add--p-закоммитить-только-часть-правок)).
+между ними осталась хотя бы одна нетронутая строка. Три строки контекста,
+которые показывают `git diff` и `git add -p`
+([урок 8](../lesson-08/README.md#add--p-закоммитить-только-часть-правок)),
+здесь **не** считаются: строки 5 и 7 ближе трёх строк друг к другу, а слились
+молча.
 
 ### Маркеры
 
@@ -320,7 +353,10 @@ git merge --abort
 ```
 
 Дерево возвращается ровно в то состояние, что было до `pull`. Ничего
-не потеряно. Это безопасная кнопка «отмена», и нажать её, если не понимаете,
+не потеряно — если до `pull` всё было закоммичено: незакоммиченные правки
+`--abort` может не восстановить (`man git-merge`). Поэтому перед `pull`
+и `merge` — `git status`, грязное дерево — закоммитить или `stash`.
+Это безопасная кнопка «отмена», и нажать её, если не понимаете,
 что происходит, правильнее, чем править маркеры наугад.
 
 У всех команд, которые умеют создавать конфликт, есть такой выход:
@@ -332,16 +368,17 @@ git merge --abort
 
 | Кнопка | Что делает |
 |---|---|
-| **Accept Current** | оставить свой вариант (верхний блок, `HEAD`) |
-| **Accept Incoming** | оставить чужой |
-| **Accept Both** | оставить оба, друг за другом |
-| **Compare Current Conflict** | открыть два варианта рядом |
+| **Accept Current Change** | оставить верхний блок (`HEAD`) |
+| **Accept Incoming Change** | оставить нижний |
+| **Accept Both Changes** | оставить оба, друг за другом |
+| **Compare Changes** | открыть два варианта рядом |
 
-Плюс `Accept All Current` / `Accept All Incoming` — на весь файл сразу,
-и `Next Conflict` для файлов с десятком конфликтов.
+Плюс команды палитры (`Ctrl+Shift+P` → Merge Conflict): `Accept All Current` /
+`Accept All Incoming` — на весь файл сразу, и `Next Conflict` для файлов
+с десятком конфликтов.
 
-Кнопка **`Resolve in Merge Editor`** открывает трёхпанельный редактор — про
-расположение панелей см. [уточнение 1](#1-в-merge-editor-слева-ваш-вариант-а-не-чужой).
+Кнопка **`Resolve in Merge Editor`** открывает трёхпанельный редактор — как
+в нём ориентироваться, см. [уточнение 1](#1-в-merge-editor-смотреть-на-подпись-панели-а-не-на-сторону).
 
 > ⚠️ **`Accept Both` — не универсальный ответ.** Она склеивает оба куска
 > подряд. Для списка сьютов это правильно, а для изменённой строки кода даст
@@ -359,12 +396,16 @@ git commit -m "слияние: оставил оба сьюта"
 git cat-file -p HEAD | grep '^parent'   # две строки!
 ```
 
-**У коммита слияния два `parent`** — это единственный вид коммита с двумя
-родителями, и именно поэтому граф в этом месте сходится обратно. На уроке 8
+**У коммита слияния два `parent`** — только у коммита слияния родителей
+больше одного, и именно поэтому граф в этом месте сходится обратно. На уроке 8
 у обычного коммита `parent` был один.
 
-Если уже закоммитили неправильное разрешение — обычный `git revert`, как любой
-коммит. До коммита — `git merge --abort`.
+Если уже закоммитили неправильное разрешение и ещё не запушили —
+`git reset --hard HEAD~1`, вернуться к состоянию до слияния. Если запушили —
+`git revert -m 1 <sha>`: у коммита слияния два родителя, и `-m 1` говорит,
+какую сторону считать основной. Без него git откажется:
+`error: commit … is a merge but no -m option was given`. До коммита —
+`git merge --abort`.
 
 ### Что с этим в `wl-e2e`
 
@@ -437,7 +478,7 @@ Worktree выкладывает то, что **лежит в репозитор�
 
 | Ветка | Роль |
 |---|---|
-| `autonomous-test-gen-experiment` | **рабочая.** Здесь чинятся и копятся тесты, сюда льют без спроса |
+| `test-generation` | **рабочая** (до 17.10 — `autonomous-test-gen-experiment`). Здесь чинятся и копятся тесты, сюда льют без спроса |
 | `draft` | **только цель для PR.** Работать на ней нельзя |
 | `AUT-{тикет}-C{кейс}-{описание}` | ветка под один PR, режется **от `origin/draft`** |
 
@@ -487,7 +528,7 @@ error: could not apply dc25ac1... AUT-1566: фикс поиска в Store
 ```bash
 git worktree add -b AUT-1566-C20992-store-search ../pr-wt draft
 cd ../pr-wt
-git -C ../big show autonomous-test-gen-experiment:tests/C20992.spec.ts > tests/C20992.spec.ts
+git -C ../big show test-generation:tests/C20992.spec.ts > tests/C20992.spec.ts
 git add tests/C20992.spec.ts
 git commit -m "AUT-1566: фикс поиска в Store (C20992)"
 git diff --stat draft...HEAD
@@ -517,7 +558,8 @@ draft...HEAD    для diff: изменения относительно точ�
 
 ### Настоящие команды процесса
 
-Из `wl-e2e/.claude/commands/bugfix-batch.md`:
+По `wl-e2e/.claude/commands/bugfix-batch.md` (там рабочая ветка ещё под старым
+именем `autonomous-test-gen-experiment`):
 
 ```bash
 git fetch origin draft
@@ -525,23 +567,20 @@ git fetch origin draft
 git worktree add -b AUT-1566-C20992-store-search \
   /home/alex/work/wl-e2e-worktrees/AUT-1566-C20992 origin/draft
 cd /home/alex/work/wl-e2e-worktrees/AUT-1566-C20992
+T=projects/monolith/tests/regression-run/client-profile/account/passes-and-memberships
 
 git -C /home/alex/work/wl-e2e show \
-  autonomous-test-gen-experiment:projects/monolith/tests/C20992.spec.ts \
-  > projects/monolith/tests/C20992.spec.ts
+  test-generation:$T/C20992.spec.ts > $T/C20992.spec.ts
 git -C /home/alex/work/wl-e2e show \
-  autonomous-test-gen-experiment:projects/monolith/tests/C20992.helpers.ts \
-  > projects/monolith/tests/C20992.helpers.ts
+  test-generation:$T/C20992.helpers.ts > $T/C20992.helpers.ts
 
 yarn install
 cp /home/alex/work/wl-e2e/projects/monolith/config/.env.staging-exp3.secure \
    projects/monolith/config/.env.staging-exp3.secure
 
-yarn eslint projects/monolith/tests/C20992.spec.ts \
-            projects/monolith/tests/C20992.helpers.ts
+yarn eslint $T/C20992.spec.ts $T/C20992.helpers.ts
 
-git add projects/monolith/tests/C20992.spec.ts \
-        projects/monolith/tests/C20992.helpers.ts
+git add $T/C20992.spec.ts $T/C20992.helpers.ts
 git commit -m "AUT-1566: fix Store search for C20992"
 git push -u origin AUT-1566-C20992-store-search
 gh pr create --base draft --title "AUT-1566 C20992 ..." --body "..."
@@ -554,7 +593,7 @@ git worktree remove /home/alex/work/wl-e2e-worktrees/AUT-1566-C20992
 - **`yarn install` обязателен.** Ветка от `draft` — другой `yarn.lock`,
   и `node_modules` в новой папке своя.
 - **`yarn eslint` до коммита, а не после.** Импорты на `draft` и на рабочей
-  ветке разошлись: файл, который линтился на `experiment`, на `draft` может
+  ветке разошлись: файл, который линтился на `test-generation`, на `draft` может
   не пройти. Это ловят здесь, а не в PR.
 - **`--base draft`** в `gh pr create` — без него PR уедет на ветку
   по умолчанию.
@@ -634,12 +673,21 @@ git rebase main              # перенести свои коммиты пов
 | Испортил файл, не коммитил | `git restore ФАЙЛ` — **вернуть будет нельзя** |
 | Push отклонили | `git fetch` → `git status -sb` → смотреть `ahead/behind` |
 | `HEAD detached` | `git switch -` |
-| Коммит уже на сервере, надо отменить | `git revert <sha>` — **не** `reset` |
+| Коммит уже на сервере, надо отменить | `git revert <sha>` — **не** `reset`; коммит слияния — `git revert -m 1 <sha>` |
 | Не помню, куда делся worktree | `git worktree list` |
 
 **Одно правило поверх всех:** пока вы не сделали `git push`, испортить можно
 только своё, и почти всё чинится. После `push` любое исправление видят все —
 поэтому там только `revert`.
+
+---
+
+## Почитать
+
+- [Pro Git](https://git-scm.com/book/ru/v2), главы 3 «Ветвление в Git»
+  и 5 «Распределённый Git».
+- [Learn Git Branching](https://learngitbranching.js.org/?locale=ru_RU), вкладка
+  «Удалённый репозиторий» — она же в домашке.
 
 ---
 

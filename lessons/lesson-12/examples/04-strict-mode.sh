@@ -86,7 +86,7 @@ cat <<'TEXT'
 
   Последняя строка — ловушка. Старый page.click(селектор) не строгий
   и молча кликнул первую из трёх. В wl-e2e таких вызовов немного
-  (page.click — 6, page.fill — 10), но часть из них в общих хелперах:
+  (около десятка), но часть из них в общих хелперах:
   helpers/monolith/reports/clients-report.ts, general-report.ts,
   setup/services/class-schedule-setup-page.ts. Ошибка в общем хелпере
   задевает все тесты, которые его зовут.

@@ -72,12 +72,17 @@ docker compose ps
 curl -X POST "localhost:3000/runs?case=C19633&status=passed"
 docker compose down
 docker compose up -d
+sleep 2
 curl localhost:3000/runs
 docker compose down -v
 docker compose up -d
+sleep 2
 curl localhost:3000/runs
 docker compose down -v
 ```
+
+`sleep 2` — `up -d` возвращается, как только `app` запущен, а слушать
+порт он начинает чуть позже: `curl` сразу после `up` может не достучаться.
 
 ## Вопросы
 

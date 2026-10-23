@@ -7,7 +7,7 @@
  *   yarn typecheck:broken                                     → две ошибки типов
  *
  * Node не проверяет типы, он их просто вырезает. Playwright тоже не проверяет.
- * Ошибку ловит только tsc, то есть `yarn typecheck` (он входит в `yarn gate`).
+ * Ошибку ловит только tsc: `yarn typecheck`, а в `yarn gate` — `check:typecheck`.
  */
 
 // Ошибка 1 — TS2322: Type 'string' is not assignable to type 'number'.

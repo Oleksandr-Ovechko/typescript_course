@@ -30,7 +30,8 @@ await Promise.all([pause(100), pause(100), pause(100)]);
 console.log('2) Promise.all, мс:', round(Date.now() - startAll));
 
 // Три ожидания по очереди складываются. Promise.all ждёт их одновременно —
-// и общее время равно самому долгому, а не сумме. В wl-e2e — 206 вхождений.
+// и общее время равно самому долгому, а не сумме. В wl-e2e — сотни вхождений
+// (около 650 на 22.10.2026).
 //
 // Здесь же видно, почему «ставить await везде и не париться» — плохой совет:
 // это ровно разница между 300 и 100.
@@ -104,7 +105,7 @@ console.log('8)', await Promise.any([rejectAfter(10, 'отказ'), pause(60).th
 // Мнемоника: race — это про скорость, кто угодно, лишь бы первым.
 // any — «хоть какой-нибудь, но чтоб сработал».
 //
-// В wl-e2e race — 95 вхождений, any — ноль.
+// В wl-e2e race — сотни вхождений, any — единицы (323 и 11 на 22.10.2026).
 
 // ── Настоящий Promise.all: почему не два await ─────────────────────────────
 //
@@ -129,10 +130,10 @@ console.log('9) появился экран:', screen);
 
 // Модель настоящего кода:
 //
-//   // projects/widgets/setup-run/001-default-business/default-business.helpers.ts:21
+//   // projects/widgets/setup-run/001-default-business/default-business.helpers.ts:41
 //   const destination = await Promise.race([
 //     page.locator('button.js-button-sign').waitFor({ state: 'visible' }).then(() => 'agreement' as const),
-//     page.getByText('Add Payment Method').waitFor({ state: 'visible' }).then(() => 'store-settings' as const),
+//     page.getByText('Add Payment Method', { exact: true }).waitFor({ state: 'visible' }).then(() => 'store-settings' as const),
 //   ]);
 //
 //   if (destination === 'store-settings') {

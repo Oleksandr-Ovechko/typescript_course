@@ -72,20 +72,21 @@ TEXT
 
 say "Как это устроено в wl-e2e"
 cat <<'TEXT'
-  Такой конфиг — projects/widgets/playwright.video.config.ts — пока есть
-  только у ведущего локально и должен появиться на draft. До тех пор его
-  можно собрать самим по образцу playwright.video.config.ts из этой
-  песочницы и спрятать от git через .git/info/exclude. Запуск:
+  Готового конфига записи в wl-e2e нет ни в одной ветке. Его собирают
+  сами — projects/widgets/playwright.video.config.ts по образцу
+  playwright.video.config.ts из этой песочницы — и прячут от git через
+  .git/info/exclude. Запуск:
     cd ~/work/wl-e2e/projects/widgets
     WL_VIDEO_DIR=../../videos/C175914 WL_VIDEO_TESTDIR=./end-to-end-tests \
     APP_ENV=staging yarn playwright test --config=playwright.video.config.ts \
       --project=chromium end-to-end-tests/event-widget/C175914.spec.ts
 
   Гостевые контексты там создаются в projects/widgets/helpers/components/
-  widgets-navigation.ts. Чтобы записать и их, recordVideo передают прямо
-  в browser.newContext() — так, как в tests/guest.spec.ts этой песочницы.
-  Этот хелпер относится к замороженным (Tier-1): уточните у ведущего,
-  можно ли оставлять правку, прежде чем её коммитить.
+  widgets-navigation.ts. Этот хелпер заморожен (Tier-1, правило A9), и
+  править его не нужно: openEmbeddedWidgetAsGuest принимает опции контекста
+  четвёртым аргументом, туда и кладут recordVideo — в своём спеке:
+    openEmbeddedWidgetAsGuest(browser, html, false, { recordVideo: { dir: … } })
+  Исключение — openScheduleWidgetAsGuest: её newContext() без параметров.
 
   Патчить Browser.prototype.newContext из конфига бесполезно: @playwright/test
   работает с собственной вложенной копией playwright-core, и патч до неё

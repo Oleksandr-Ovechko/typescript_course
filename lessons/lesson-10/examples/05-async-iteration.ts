@@ -61,10 +61,10 @@ const text = parts.join('');
 console.log('6) кусков:', parts.length, '· склеено строк:', text.trim().split('\n').length);
 
 // ── Настоящий код из wl-e2e ───────────────────────────────────────────────
-// for await в проекте встречается семь раз, и все семь — вот эта форма.
-// projects/widgets/tests/regression-run/appointment-widget/new-appointment-widget/C139796.helpers.ts:617
-// (на рабочей ветке autonomous-test-gen-experiment; на origin/draft этого
-// файла нет):
+// for await в проекте встречается восемь раз на test-generation и семь на draft,
+// и все — вот эта форма.
+// projects/widgets/tests/regression-run/appointment-widget/new-appointment-widget/C139796.helpers.ts:656
+// (есть и на test-generation, и на draft):
 //
 //   const stream = await download.createReadStream();
 //   const chunks: Buffer[] = [];
