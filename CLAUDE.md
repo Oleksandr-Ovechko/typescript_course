@@ -30,9 +30,9 @@ playground/                   код текущего урока: заполня
 node playground/scratch.ts        запустить свой код
 node lessons/.../examples/X.ts    запустить пример
 yarn typecheck                    типы: playground + examples
-yarn typecheck:hwNN               типы: домашка урока NN
-yarn typecheck:modules            типы: пример с импортом между файлами
-yarn typecheck:broken             намеренно сломанные файлы
+yarn typecheck:hwNN               типы: домашка урока NN            ┐ появляются в package.json
+yarn typecheck:modules            типы: пример с импортом между файлами │ вместе со своим уроком
+yarn typecheck:broken             намеренно сломанные файлы          ┘ (уроки 5 и 8)
 ```
 
 Курс идёт вторым потоком (с 2026-11): `lessons/` пополняется по мере занятий,
