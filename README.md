@@ -19,31 +19,21 @@ yarn install     # или npm install — здесь одна зависимос
 
 ```bash
 node playground/scratch.ts                           # запустить свой код
-node lessons/lesson-03/examples/02-functions.ts       # запустить пример урока
+node lessons/lesson-NN/examples/<файл>.ts             # запустить пример урока
 yarn typecheck                                       # типы: playground + примеры
-yarn typecheck:hw2                                   # типы: домашка урока 2
-yarn typecheck:hw3                                   # типы: домашка урока 3
-yarn typecheck:hw5                                   # типы: домашка урока 5
-yarn typecheck:hw6                                   # типы: домашка урока 6
-yarn typecheck:hw10                                  # типы: домашка урока 10
-yarn typecheck:hw12                                  # типы: домашка урока 12
-yarn typecheck:hw13                                  # типы: домашка урока 13
-yarn typecheck:hw14                                  # типы: домашка урока 14
-yarn typecheck:modules                               # типы: пример про импорты
-yarn typecheck:broken                                # намеренно сломанные файлы
-
-bash lessons/lesson-08/examples/01-three-trees.sh     # запустить пример по git
+yarn typecheck:hwNN                                  # типы: домашка урока NN — появляется вместе с уроком
 ```
 
-> Примеры уроков 8, 9, 11 и 12 — не TypeScript, а исполняемые сценарии `bash`.
-> Каждый заводит свою песочницу в `/tmp/wl-git-examples/` (git) или
-> `/tmp/wl-pw-examples/` (Playwright), выполняет команды и по ходу объясняет вывод. Ничего за пределами `/tmp` они не трогают, рабочий репозиторий
-> в безопасности.
+> Примеры инструментальных уроков (git, Playwright, Docker) — не TypeScript,
+> а исполняемые сценарии `bash`. Каждый заводит свою песочницу в `/tmp/`,
+> выполняет команды и по ходу объясняет вывод. Ничего за пределами `/tmp`
+> они не трогают, рабочий репозиторий в безопасности.
 
-> Корневой `tsconfig.json` **дословно повторяет `tsconfig.json` из wl-e2e** —
-> поведение компилятора здесь и на проекте совпадает один в один. Он покрывает
-> `playground/`, включая любые подпапки. У домашки свой конфиг: он наследует те же
-> настройки и меняет только список файлов — до выполнения она намеренно не проходит
+> Настройки компилятора в корневом `tsconfig.json` **повторяют `tsconfig.json` из wl-e2e**,
+> кроме `lib` (в проекте есть ещё `DOM.Iterable`) — поведение компилятора здесь
+> и на проекте совпадает. Он покрывает `playground/`, включая любые подпапки,
+> и примеры уроков. У домашки свой конфиг: он наследует те же настройки
+> и меняет только список файлов — до выполнения она намеренно не проходит
 > проверку, и её ошибки не должны мешаться с вашими.
 
 ## Как устроен курс
@@ -75,25 +65,12 @@ playground/        ← где набираем код: на уроке и сам
 
 ## Уроки
 
+Материалы появляются по ходу курса: до занятия — план и словарь терминов,
+после — полный конспект, примеры и домашка.
+
 | # | Тема | Материалы |
 |---|------|-----------|
-| 1 | Структура проекта, транспиляция, `tsconfig`, встроенные типы | [конспект](lessons/lesson-01/) |
-| 2 | Типы объектов, структурная типизация, дженерики, union'ы | [конспект](lessons/lesson-02/) · [примеры](lessons/lesson-02/examples/) · [домашка](lessons/lesson-02/homework/) |
-| 3 | Как читать файл теста: `?.` и `??`, функции и колбэки, модули, деструктуризация | [конспект](lessons/lesson-03/) · [примеры](lessons/lesson-03/examples/) · [домашка](lessons/lesson-03/homework/) |
-| 4 | Ловушки JavaScript: `typeof`, приведение типов, числа, строки, область видимости | [конспект](lessons/lesson-04/) · [примеры](lessons/lesson-04/examples/) |
-| 5 | Асинхронность: промисы, `.then`/`.catch`/`.finally`, `async`/`await`, `Promise.all` | [конспект](lessons/lesson-05/) · [примеры](lessons/lesson-05/examples/) · [домашка](lessons/lesson-05/homework/) |
-| 6 | Замыкания, `this` и контекст: лексическое окружение, `call`/`apply`/`bind` | [конспект](lessons/lesson-06/) · [примеры](lessons/lesson-06/examples/) · [домашка](lessons/lesson-06/homework/) |
-| 8 | Git: своя история — три дерева, ветки, чтение истории, откаты, `reflog` | [конспект](lessons/lesson-08/) · [примеры](lessons/lesson-08/examples/) · [домашка](lessons/lesson-08/homework/) |
-| 9 | Git: чужие изменения — сервер, конфликты, `worktree`, PR на `draft` | [конспект](lessons/lesson-09/) · [примеры](lessons/lesson-09/examples/) · [домашка](lessons/lesson-09/homework/) |
-| 10 | Циклы, перебор и генераторы: `for...of`, протокол итератора, `function*`, `for await` | [конспект](lessons/lesson-10/) · [примеры](lessons/lesson-10/examples/) · [домашка](lessons/lesson-10/homework/) |
-| 11 | Playwright: запуск и разбор падения — `yarn staging`, фильтры, ретраи, трейс, флейки | [конспект](lessons/lesson-11/) · [примеры](lessons/lesson-11/examples/) · [домашка](lessons/lesson-11/homework/) |
-| 12 | Локаторы и откуда у объекта методы — автоожидание, `isVisible`, строгий режим, выбор локатора, iframe, прототипы | [конспект](lessons/lesson-12/) · [примеры](lessons/lesson-12/examples/) · [домашка](lessons/lesson-12/homework/) |
-| 13 | Прототипы, конструкторы, классы: что делает `new`, `class` как запись, `TestRailReporter` | [конспект](lessons/lesson-13/) · [примеры](lessons/lesson-13/examples/) · [домашка](lessons/lesson-13/homework/) |
-| 14 | ООП на материале проекта: инкапсуляция, наследование, полиморфизм, абстракция — и почему наши хелперы написаны функциями | [конспект](lessons/lesson-14/) · [примеры](lessons/lesson-14/examples/) · [домашка](lessons/lesson-14/homework/) |
-| 15 | Регулярные выражения целиком: две записи, флаги, методы, классы, экранирование, наборы, квантификаторы, группы, обратные ссылки, альтернация, проверки вперёд и назад, регулярка в локаторе — на строках проекта | [конспект](lessons/lesson-15/) · [примеры](lessons/lesson-15/examples/) · [домашка](lessons/lesson-15/homework/) |
-| 16 | Браузер и DOM: дерево, узлы, атрибуты и свойства, события, формы, загрузка страницы, `MutationObserver` — и что из этого делает Playwright | [конспект](lessons/lesson-16/) · [примеры](lessons/lesson-16/examples/) · [домашка](lessons/lesson-16/homework/) |
-| 17 | Проект изнутри: воркспейсы и установка, путь одного теста и `yarn case`, кэш входа, окружения и `.secure`, паки `setup-run` и «уже есть — но такой ли?», команды проекта, дорожки, кластеры, гейт | [конспект](lessons/lesson-17/) · [домашка](lessons/lesson-17/homework/) |
-| 18 | Docker с нуля на учебном `runlog`: образы, контейнеры, `Dockerfile`, слои и кэш, параметры запуска, тома, сеть, `docker compose` · Docker в `wl-e2e` · оркестрация и Kubernetes · CI с вашим PR · итог курса | [конспект](lessons/lesson-18/) · [примеры](lessons/lesson-18/examples/) · [домашка](lessons/lesson-18/homework/) |
+| 1 | ИИ-инструменты в работе · введение в проект `wl-e2e` | [план и словарь](lessons/lesson-01/) |
 
 ## Соглашения в коде методичек
 
