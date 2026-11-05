@@ -1,9 +1,9 @@
 {
-  "name": "wl-ts-course",
+  "name": "js-ts-course",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "JS/TS course for wl-e2e team",
+  "description": "JS/TS and test automation course",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
