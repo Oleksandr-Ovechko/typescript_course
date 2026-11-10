@@ -23,9 +23,8 @@ node lessons/lesson-02/homework/01-predict-output.ts   # запустить фа
 yarn typecheck:hw2                                     # проверить типы домашки
 ```
 
-Файлы заданий 1 и 2 правьте прямо в репозитории. Перед уроком 3 их можно
-вернуть в исходный вид командой `git restore lessons/lesson-02/homework`,
-а свои решения сохранить копией в `playground/lesson-02/`.
+Файлы заданий 1 и 2 правьте прямо здесь, в `lessons/lesson-02/homework/`:
+команды выше и `yarn typecheck:hw2` смотрят именно сюда.
 
 ## Про задание 1
 
