@@ -6,7 +6,8 @@
   "description": "JS/TS and test automation course",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "typecheck:hw2": "tsc --noEmit -p lessons/lesson-02/homework"
+    "typecheck:hw2": "tsc --noEmit -p lessons/lesson-02/homework",
+    "typecheck:hw3": "tsc --noEmit -p lessons/lesson-03/homework"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
