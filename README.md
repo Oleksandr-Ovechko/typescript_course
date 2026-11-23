@@ -84,7 +84,8 @@ playground/        ← где набираем код: на уроке и сам
 | 1 | ИИ-инструменты в работе · как устроен JS/TS-проект · первый файл на TypeScript | [конспект](lessons/lesson-01/) · [домашка](lessons/lesson-01/homework/) |
 | 2 | Значения и операторы: `const`/`let`, типы значений, приведение типов, строки, числа | [конспект](lessons/lesson-02/) · [примеры](lessons/lesson-02/examples/) · [домашка](lessons/lesson-02/homework/) |
 | 3 | Условия и циклы: сравнения, `&&`/`\|\|`/`??`, `if`/тернарник/`switch`, массив, `for`/`while`/`for...of` | [конспект](lessons/lesson-03/) · [примеры](lessons/lesson-03/examples/) · [домашка](lessons/lesson-03/homework/) |
-| 4 | Функции и область видимости: записи функций, параметры и `...`, колбэки, рекурсия, `var`/`let`/`const`, поднятие, замыкание, `this`/`call`/`bind` — два занятия | [конспект части 1](lessons/lesson-04/) · [примеры](lessons/lesson-04/examples/) · [домашка](lessons/lesson-04/homework/) |
+| 4 | Функции и область видимости: записи функций, параметры и `...`, колбэки, рекурсия, `var`/`let`/`const`, поднятие | [конспект](lessons/lesson-04/) · [примеры](lessons/lesson-04/examples/) · [домашка](lessons/lesson-04/homework/) |
+| 5 | Замыкание, объекты: свойства, `?.`, ссылки и копии, методы, `this`/`call`/`bind` | [план и словарь](lessons/lesson-05/) |
 
 ## Соглашения в коде методичек
 
