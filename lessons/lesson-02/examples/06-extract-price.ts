@@ -26,7 +26,7 @@ console.log('1)', digitsOnly, parseInt(digitsOnly), parseFloat(digitsOnly)); // 
 // Первая строка — цепочка ||: атрибут с суммой; нет атрибута (null) — текст
 // элемента; нет и текста — пустая строка.
 // Вторая — убрать всё, кроме цифр и точки (/[^0-9.]/g — регулярное
-// выражение, урок 13), и прочитать с дробной частью.
+// выражение), и прочитать с дробной частью.
 const attribute = null;
 const elementText = '$1,234.56';
 const text = attribute || elementText || '';

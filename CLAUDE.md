@@ -45,7 +45,7 @@ node lessons/.../examples/X.ts    запустить пример
 yarn typecheck                    типы: playground + examples
 yarn typecheck:hwNN               типы: домашка урока NN            ┐ появляются в package.json
 yarn typecheck:modules            типы: пример с импортом между файлами │ вместе со своим уроком
-yarn typecheck:broken             намеренно сломанные файлы          ┘ (уроки 6 и 9)
+yarn typecheck:broken             намеренно сломанные файлы          ┘ (урок 9)
 ```
 
 Курс идёт вторым потоком (с 2026-11): `lessons/` пополняется по мере занятий,
@@ -64,7 +64,7 @@ yarn typecheck:broken             намеренно сломанные файл
 
 **Отдельные tsconfig-проекты.** Корневой покрывает `playground/` и `examples/`.
 Свои конфиги есть у `homework/` и `examples/broken/` — там ошибки намеренные
-и не должны мешаться с настоящими, — и у `examples/modules/` урока про модули (урок 6), где нужен
+и не должны мешаться с настоящими, — и у `examples/modules/` урока про модули (урок 9), где нужен
 `allowImportingTsExtensions` (см. ниже). Дочерние конфиги обязаны переопределять
 `"exclude": []` — иначе унаследуют `exclude` корневого и исключат сами себя
 (`TS18003`).
