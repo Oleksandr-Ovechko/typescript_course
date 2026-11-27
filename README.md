@@ -86,7 +86,7 @@ playground/        ← где набираем код: на уроке и сам
 | 3 | Условия и циклы: сравнения, `&&`/`\|\|`/`??`, `if`/тернарник/`switch`, массив, `for`/`while`/`for...of` | [конспект](lessons/lesson-03/) · [примеры](lessons/lesson-03/examples/) · [домашка](lessons/lesson-03/homework/) |
 | 4 | Функции и область видимости: записи функций, параметры и `...`, колбэки, рекурсия, `var`/`let`/`const`, поднятие | [конспект](lessons/lesson-04/) · [примеры](lessons/lesson-04/examples/) · [домашка](lessons/lesson-04/homework/) |
 | 5 | Замыкание, объекты: свойства, `?.`, ссылки и копии, методы и `this` | [конспект](lessons/lesson-05/) · [примеры](lessons/lesson-05/examples/) · [домашка](lessons/lesson-05/homework/) |
-| 6 | `call`/`apply`/`bind`, деструктуризация, обход объекта, `??=`, ошибки (запас) | [план и словарь](lessons/lesson-06/) |
+| 6 | `call`/`apply`/`bind`, деструктуризация, обход объекта, `??=`, ошибки | [конспект](lessons/lesson-06/) · [примеры](lessons/lesson-06/examples/) · [домашка](lessons/lesson-06/homework/) |
 
 ## Соглашения в коде методичек
 
